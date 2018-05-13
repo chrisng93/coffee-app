@@ -1,12 +1,90 @@
+import {Checkbox, Toggle} from 'material-ui';
 import React, { Component } from 'react';
-import Paper from 'material-ui/Paper';
 
-import STYLES from './styles';
+const TITLE = 'Coffee App';
+const COFFEE = 'coffee';
+const STUDY = 'study';
+const GRAM = 'gram';
 
 export default class Filter extends Component {
-  render() {
+  constructor(props) {
+    super(props);
+    this.state = {
+      selectedFilter: null,
+    };
+  }
+
+  renderCoffeeSubfilters() {
     return (
-      <Paper style={STYLES.filter} zDepth={2} rounded={false} />
+      <div>
+        <div>
+          <h3>Types</h3>
+          <div>
+            <Checkbox label="Cold brew" />
+            <Checkbox label="Matcha" />
+          </div>
+        </div>
+        <div>
+          <h3>Milk Substitutes</h3>
+          <div>
+            <Checkbox label="Oat milk" />
+            <Checkbox label="Almond milk" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  renderStudySubfilters() {
+    return (
+      <div>
+        <h3>Options</h3>
+        <Checkbox label="Wifi" />
+        <Checkbox label="Quiet" />
+        <Checkbox label="Has outlets" />
+        <Checkbox label="Open late" />
+      </div>
+    );
+  }
+
+  renderSubfilters() {
+    const {selectedFilter} = this.state;
+    switch (selectedFilter) {
+      case COFFEE:
+        return this.renderCoffeeSubfilters();
+      case STUDY:
+        return this.renderStudySubfilters();
+    }
+  }
+
+  render() {
+    const {selectedFilter} = this.state;
+    return (
+      <div className="filter">
+        <h1>{TITLE}</h1>
+        <Toggle label="Open Now" onToggle={() => console.log('Filter for open restaurants')} />
+        <div>
+          <h2>I want...</h2>
+          <div>
+            <Checkbox
+              label="Good coffee"
+              checked={selectedFilter === COFFEE}
+              onCheck={(e, isInputChecked) => this.setState({selectedFilter: isInputChecked ? COFFEE : null})}
+            />
+            <Checkbox
+              label="To study"
+              checked={selectedFilter === STUDY}
+              onCheck={(e, isInputChecked) => this.setState({selectedFilter: isInputChecked ? STUDY : null})}
+            />
+            <Checkbox
+              label="To do it for the gram"
+              checked={selectedFilter === GRAM}
+              onCheck={(e, isInputChecked) => this.setState({selectedFilter: isInputChecked ? GRAM : null})}
+            />
+          </div>
+        </div>
+        {this.renderSubfilters()}
+      </div>
     );
   }
 }

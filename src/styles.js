@@ -17,9 +17,10 @@ const STYLES = {
   },
   filter: {
     position: 'absolute',
-    right: '20px',
+    top: '40px',
     bottom: '40px',
-    width: '200px',
+    left: '20px',
+    width: '300px',
     zIndex: 1,
   },
 };
