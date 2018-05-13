@@ -1,9 +1,9 @@
 /*eslint-disable no-undef*/
 // Need to disable no-undef for google maps definitions.
-import Dialog from 'material-ui/Dialog';
-import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import React, {Component} from 'react';
 
-import RestaurantModal from './RestaurantModal';
+import MAP_STYLES from './mapStyles';
 
 const NY_VIEW = {
   center: {lat: 40.727911, lng: -73.985537},
@@ -11,6 +11,8 @@ const NY_VIEW = {
 }
 
 export default class Map extends Component {
+  map;
+
   constructor(props) {
     super(props);
     this.state = {
@@ -20,7 +22,11 @@ export default class Map extends Component {
   }
 
   componentDidMount() {
-    this.map = new google.maps.Map(document.getElementById('map'), NY_VIEW);
+    this.map = new google.maps.Map(document.getElementById('map'), {
+      ...NY_VIEW,
+      styles: MAP_STYLES,
+    });
+    this.props.setMap(this.map);
     // this.map.fitBounds(this.createBounds(restaurants));
   }
 
@@ -36,3 +42,7 @@ export default class Map extends Component {
     );
   }
 }
+
+Map.propTypes = {
+  setMap: PropTypes.func.isRequired,
+};

@@ -1,5 +1,10 @@
+/*eslint-disable no-undef*/
+// Need to disable no-undef for google maps definitions.
 import {Checkbox, Toggle} from 'material-ui';
-import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import React, {Component} from 'react';
+
+import SearchBar from './SearchBar';
 
 const TITLE = 'Coffee App';
 const COFFEE = 'coffee';
@@ -54,6 +59,8 @@ export default class Filter extends Component {
         return this.renderCoffeeSubfilters();
       case STUDY:
         return this.renderStudySubfilters();
+      default:
+        return null;
     }
   }
 
@@ -62,6 +69,7 @@ export default class Filter extends Component {
     return (
       <div className="filter">
         <h1>{TITLE}</h1>
+        <SearchBar map={this.props.map} />
         <Toggle label="Open Now" onToggle={() => console.log('Filter for open restaurants')} />
         <div>
           <h2>I want...</h2>
@@ -88,3 +96,7 @@ export default class Filter extends Component {
     );
   }
 }
+
+Filter.propTypes = {
+  map: PropTypes.any,
+};
