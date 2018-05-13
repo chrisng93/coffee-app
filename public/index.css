@@ -1,0 +1,10 @@
+body {
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  font-family: 'Droid Sans', sans-serif;
+  text-transform: lowercase;
+  cursor: default;
+  color: #4e5a65;
+}
