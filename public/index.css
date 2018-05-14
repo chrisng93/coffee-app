@@ -47,7 +47,8 @@ body {
   height: 160px;
   padding: 24px;
   z-index: 1;
-  background-color: #B0BEC5; /* blueGrey200 */
+  background-color: #90A4AE; /* blueGrey300 */
+  opacity: 0.95;
 }
 
 /* Medium and down */

@@ -91,7 +91,6 @@ export default class SearchBar extends Component {
 
   render() {
     const {searchText, predictions, selectedPrediction} = this.state;
-    // TODO: Make ListItems go above Checkboxes.
     return (
       <div className="search-bar">
         <TextField
