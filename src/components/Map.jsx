@@ -3,7 +3,7 @@
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 
-import MAP_STYLES from './mapStyles';
+import MAP_STYLES from '../mapStyles';
 
 const NY_VIEW = {
   center: {lat: 40.727911, lng: -73.985537},
@@ -27,11 +27,6 @@ export default class Map extends Component {
       styles: MAP_STYLES,
     });
     this.props.setMap(this.map);
-    // this.map.fitBounds(this.createBounds(restaurants));
-  }
-
-  createBounds() {
-
   }
 
   render() {

@@ -99,8 +99,10 @@ export default class SearchBar extends Component {
           hintText="Search"
           onChange={(event, val) => this.onInputChange(val)}
           underlineShow={false}
-          hintStyle={{paddingLeft: '12px', lineHeight: '30px'}}
-          inputStyle={{paddingLeft: '12px', lineHeight: '30px'}}
+          fullWidth={true}
+          style={{height: '100%', lineHeight: '16px'}}
+          hintStyle={{paddingLeft: '24px'}}
+          inputStyle={{paddingLeft: '24px'}}
         />
         <List>
           {_.map(predictions, (prediction, index) =>
