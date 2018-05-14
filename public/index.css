@@ -11,23 +11,44 @@ body {
 
 #map {
   position: absolute;
-  top: 0;
+  top: 64px;
   bottom: 0;
-  left: 300px;
+  left: 0;
   right: 0;
 }
 
-.filter {
+.app-bar {
   position: absolute;
   top: 0;
-  bottom: 0;
+  right: 0;
   left: 0;
-  width: 300px;
+  height: 64px !important;
+  padding: 0 40px !important;
+  background-color: #90A4AE !important; /* blueGrey300 */
 }
 
 .search-bar {
   height: 40px;
-  width: 80%;
+  width: 100%;
   border: #000 1px solid;
   border-radius: 10px;
+  z-index: 2;
+}
+
+.filters {
+  position: absolute;
+  top: 64px;
+  left: 0;
+  right: 0;
+  height: 160px;
+  padding: 24px;
+  z-index: 1;
+  background-color: #B0BEC5; /* blueGrey200 */
+}
+
+/* Medium and down */
+@media only screen and (max-width: 991px) {
+  .filters {
+    padding: 8px;
+  }
 }
