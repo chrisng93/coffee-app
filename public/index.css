@@ -25,9 +25,14 @@ body {
   width: 300px;
 }
 
+.filter h1 {
+  text-align: center;
+}
+
 .search-bar {
   height: 40px;
   width: 80%;
   border: #000 1px solid;
   border-radius: 10px;
+  margin: auto;
 }

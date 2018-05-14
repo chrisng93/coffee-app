@@ -65,7 +65,7 @@ export default class SearchBar extends Component {
       const feature = new google.maps.Data.Feature({id: 'search', geometry: result.geometry.location});
       map.data.add(feature);
 
-      this.setState({searchText: '', predictions: []});
+      this.setState({searchText: '', predictions: [], selectedPrediction: -1});
     });
   }
 
@@ -77,16 +77,15 @@ export default class SearchBar extends Component {
 
     if (event.keyCode === 38 && selectedPrediction > -1) {
       // Up arrow event, don't allow user to select below index -1 (no selection).
-      selectedPrediction--;
+      selectedPrediction = Math.min(selectedPrediction--, predictions.length - 1);
       this.setState({selectedPrediction});
     } else if (event.keyCode === 40 && selectedPrediction < predictions.length - 1) {
-      // Down arrow event, don't allow user to select more than the autocomplete options list size.
+      // Down arrow event, don't allow user to select more than the predictions array size.
       selectedPrediction++;
       this.setState({selectedPrediction});
     } else if (event.keyCode === 13 && selectedPrediction > -1) {
       // Enter key event, we have an actual selection.
       this.onSelectPrediction(predictions[selectedPrediction]);
-      this.setState({predictions: [], selectedPrediction: -1});
     }
   }
 
@@ -100,6 +99,8 @@ export default class SearchBar extends Component {
           hintText="Search"
           onChange={(event, val) => this.onInputChange(val)}
           underlineShow={false}
+          hintStyle={{paddingLeft: '12px', lineHeight: '30px'}}
+          inputStyle={{paddingLeft: '12px', lineHeight: '30px'}}
         />
         <List>
           {_.map(predictions, (prediction, index) =>

@@ -70,28 +70,30 @@ export default class Filter extends Component {
       <div className="filter">
         <h1>{TITLE}</h1>
         <SearchBar map={this.props.map} />
-        <Toggle label="Open Now" onToggle={() => console.log('Filter for open restaurants')} />
-        <div>
-          <h2>I want...</h2>
+        <div style={{margin: '16px'}}>
+          <Toggle label="Open Now" onToggle={() => console.log('Filter for open restaurants')} />
           <div>
-            <Checkbox
-              label="Good coffee"
-              checked={selectedFilter === COFFEE}
-              onCheck={(e, isInputChecked) => this.setState({selectedFilter: isInputChecked ? COFFEE : null})}
-            />
-            <Checkbox
-              label="To study"
-              checked={selectedFilter === STUDY}
-              onCheck={(e, isInputChecked) => this.setState({selectedFilter: isInputChecked ? STUDY : null})}
-            />
-            <Checkbox
-              label="To do it for the gram"
-              checked={selectedFilter === GRAM}
-              onCheck={(e, isInputChecked) => this.setState({selectedFilter: isInputChecked ? GRAM : null})}
-            />
+            <h2>I want...</h2>
+            <div>
+              <Checkbox
+                label="Good coffee"
+                checked={selectedFilter === COFFEE}
+                onCheck={(e, isInputChecked) => this.setState({selectedFilter: isInputChecked ? COFFEE : null})}
+              />
+              <Checkbox
+                label="To study"
+                checked={selectedFilter === STUDY}
+                onCheck={(e, isInputChecked) => this.setState({selectedFilter: isInputChecked ? STUDY : null})}
+              />
+              <Checkbox
+                label="To do it for the gram"
+                checked={selectedFilter === GRAM}
+                onCheck={(e, isInputChecked) => this.setState({selectedFilter: isInputChecked ? GRAM : null})}
+              />
+            </div>
           </div>
+          {this.renderSubfilters()}
         </div>
-        {this.renderSubfilters()}
       </div>
     );
   }
