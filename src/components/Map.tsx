@@ -18,7 +18,7 @@ export default class Map extends React.Component<Props, {}> {
   map: google.maps.Map;
 
   componentDidMount() {
-    const {center, zoom, mapStyles, setMap} = this.props;
+    const { center, zoom, mapStyles, setMap } = this.props;
     this.map = new google.maps.Map(document.getElementById('map'), {
       center,
       zoom,
@@ -35,7 +35,7 @@ export default class Map extends React.Component<Props, {}> {
   render() {
     return (
       <div>
-        <div id="map"></div>
+        <div id="map" />
       </div>
     );
   }

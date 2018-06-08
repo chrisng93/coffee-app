@@ -8,20 +8,26 @@
     "@types/react-dom": "^16.0.6",
     "@types/underscore": "^1.8.8",
     "material-ui": "^0.20.0",
+    "path": "^0.12.7",
     "react": "^16.4.0",
     "react-dom": "^16.4.0",
-    "react-scripts": "1.1.4",
     "underscore": "^1.9.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "babel": "babel --presets es2015 js/main.js -o public/main.bundle.js",
+    "start": "npm run webpack",
+    "webpack": "webpack",
+    "prettier": "prettier --single-quote --trailing-comma all --write \"src/**/*.{ts,tsx}\""
   },
   "devDependencies": {
     "awesome-typescript-loader": "^5.0.0",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.4",
+    "babel-preset-env": "^1.7.0",
+    "prettier": "1.13.4",
     "source-map-loader": "^0.2.3",
-    "typescript": "^2.9.1"
+    "typescript": "^2.9.1",
+    "webpack": "^4.11.1",
+    "webpack-cli": "^3.0.3"
   }
 }
