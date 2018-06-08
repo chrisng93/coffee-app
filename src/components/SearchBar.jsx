@@ -63,6 +63,7 @@ export default class SearchBar extends Component {
 
       map.panTo(result.geometry.location);
       const feature = new google.maps.Data.Feature({id: 'search', geometry: result.geometry.location});
+      // TODO: Use map's mapData to render.
       map.data.add(feature);
 
       this.setState({searchText: '', predictions: [], selectedPrediction: -1});
@@ -75,9 +76,9 @@ export default class SearchBar extends Component {
       return;
     }
 
-    if (event.keyCode === 38 && selectedPrediction > -1) {
+    if (event.keyCode === 38 && selectedPrediction > 0) {
       // Up arrow event, don't allow user to select below index -1 (no selection).
-      selectedPrediction = Math.min(selectedPrediction--, predictions.length - 1);
+      selectedPrediction--;
       this.setState({selectedPrediction});
     } else if (event.keyCode === 40 && selectedPrediction < predictions.length - 1) {
       // Down arrow event, don't allow user to select more than the predictions array size.
@@ -86,6 +87,8 @@ export default class SearchBar extends Component {
     } else if (event.keyCode === 13 && selectedPrediction > -1) {
       // Enter key event, we have an actual selection.
       this.onSelectPrediction(predictions[selectedPrediction]);
+    } else if (event.keyCode === 27) {
+      this.setState({predictions: [], selectedPrediction: -1});
     }
   }
 

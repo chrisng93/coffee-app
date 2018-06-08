@@ -3,31 +3,23 @@
 import PropTypes from 'prop-types';
 import React, {Component} from 'react';
 
-import MAP_STYLES from '../mapStyles';
-
-const NY_VIEW = {
-  center: {lat: 40.727911, lng: -73.985537},
-  zoom: 14,
-}
-
 export default class Map extends Component {
   map;
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      ...NY_VIEW,
-    };
-    this.map = null;
+  componentDidMount() {
+    const {center, zoom, mapStyles, setMap} = this.props;
+    this.map = new google.maps.Map(document.getElementById('map'), {
+      center,
+      zoom,
+      styles: mapStyles || {},
+      fullscreenControl: false,
+    });
+    if (setMap) {
+      setMap(this.map);
+    }
   }
 
-  componentDidMount() {
-    this.map = new google.maps.Map(document.getElementById('map'), {
-      ...NY_VIEW,
-      styles: MAP_STYLES,
-    });
-    this.props.setMap(this.map);
-  }
+  // TODO: Reconcile data and use it to render.
 
   render() {
     return (
@@ -39,5 +31,9 @@ export default class Map extends Component {
 }
 
 Map.propTypes = {
-  setMap: PropTypes.func.isRequired,
+  center: PropTypes.object.isRequired,
+  zoom: PropTypes.number.isRequired,
+  data: PropTypes.array.isRequired,
+  mapStyles: PropTypes.array,
+  setMap: PropTypes.func,
 };
