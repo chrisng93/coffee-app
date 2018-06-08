@@ -1,5 +1,6 @@
-import React, {Component} from 'react';
+import * as React from 'react';
 
+import {FilterType} from '../consts';
 import MAP_STYLES from '../mapStyles';
 import AppBar from './AppBar';
 import Map from './Map';
@@ -9,14 +10,21 @@ const NY_VIEW = {
   zoom: 14,
 };
 
+interface State {
+  map: google.maps.Map;
+  mapData: any[];
+  selectedFilter: FilterType;
+  openNow: boolean;
+}
+
 // TODO: Use typescript.
-export default class App extends Component {
-  constructor(props) {
+export default class App extends React.Component<{}, State> {
+  constructor(props: {}) {
     super(props);
     this.state = {
       map: null,
       mapData: [],
-      selectedFilter: '',
+      selectedFilter: null,
       openNow: false,
     };
   }
@@ -29,10 +37,10 @@ export default class App extends Component {
           map={map}
           selectedFilter={selectedFilter}
           openNow={openNow}
-          onSelectFilter={selectedFilter => this.setState({selectedFilter})}
+          onSelectFilter={(selectedFilter: FilterType) => this.setState({selectedFilter})}
           onToggleOpenNow={() => this.setState({openNow: !openNow})}
         />
-        <Map setMap={newMap => this.setState({map: newMap})} {...NY_VIEW} mapStyles={MAP_STYLES} data={mapData} />
+        <Map setMap={(newMap: google.maps.Map) => this.setState({map: newMap})} {...NY_VIEW} mapStyles={MAP_STYLES} />
       </div>
     );
   }

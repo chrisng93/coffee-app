@@ -1,16 +1,23 @@
-/*eslint-disable no-undef*/
-// Need to disable no-undef for google maps definitions.
 import {List, ListItem, TextField} from 'material-ui';
 import * as colors from 'material-ui/styles/colors';
-import PropTypes from 'prop-types';
-import React, {Component} from 'react';
+import * as React from 'react';
 import * as _ from 'underscore';
 
-export default class SearchBar extends Component {
-  autocomplete; // Google autocomplete service.
-  places; // Google places service.
+interface Props {
+  map: google.maps.Map;
+}
 
-  constructor(props) {
+interface State {
+  searchText: string;
+  predictions: google.maps.places.AutocompletePrediction[];
+  selectedPrediction: number;
+}
+
+export default class SearchBar extends React.Component<Props, State> {
+  private autocomplete: google.maps.places.AutocompleteService; // Google autocomplete service.
+  private places: google.maps.places.PlacesService; // Google places service.
+
+  constructor(props: Props) {
     super(props);
     this.state = {
       searchText: '',
@@ -21,20 +28,20 @@ export default class SearchBar extends Component {
   }
 
   componentWillMount() {
-    document.addEventListener('keydown', event => this.handleKeyDown(event));
+    document.addEventListener('keydown', event => this.handleKeyDown(event.keyCode));
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps: Props) {
     if (!this.places && nextProps.map) {
       this.places = new google.maps.places.PlacesService(nextProps.map);
     }
   }
 
   componentWillUnmount() {
-    document.removeEventListener('keydown', event => this.handleKeyDown(event));
+    document.removeEventListener('keydown', event => this.handleKeyDown(event.keyCode));
   }
 
-  onInputChange(input) {
+  onInputChange(input: string) {
     const {map} = this.props;
     const bounds = map ? map.getBounds() : null;
     this.setState({searchText: input}, () => {
@@ -53,7 +60,7 @@ export default class SearchBar extends Component {
     });
   }
 
-  onSelectPrediction({place_id}) {
+  onSelectPrediction(place_id: string) {
     const {map} = this.props;
     this.places.getDetails({placeId: place_id}, (result, status) => {
       if (status !== google.maps.places.PlacesServiceStatus.OK) {
@@ -70,24 +77,24 @@ export default class SearchBar extends Component {
     });
   }
 
-  handleKeyDown(event) {
+  handleKeyDown(keyCode: number) {
     let {predictions, selectedPrediction} = this.state;
     if (!predictions.length) {
       return;
     }
 
-    if (event.keyCode === 38 && selectedPrediction > 0) {
+    if (keyCode === 38 && selectedPrediction > 0) {
       // Up arrow event, don't allow user to select below index -1 (no selection).
       selectedPrediction--;
       this.setState({selectedPrediction});
-    } else if (event.keyCode === 40 && selectedPrediction < predictions.length - 1) {
+    } else if (keyCode === 40 && selectedPrediction < predictions.length - 1) {
       // Down arrow event, don't allow user to select more than the predictions array size.
       selectedPrediction++;
       this.setState({selectedPrediction});
-    } else if (event.keyCode === 13 && selectedPrediction > -1) {
+    } else if (keyCode === 13 && selectedPrediction > -1) {
       // Enter key event, we have an actual selection.
-      this.onSelectPrediction(predictions[selectedPrediction]);
-    } else if (event.keyCode === 27) {
+      this.onSelectPrediction(predictions[selectedPrediction].place_id);
+    } else if (keyCode === 27) {
       this.setState({predictions: [], selectedPrediction: -1});
     }
   }
@@ -113,7 +120,7 @@ export default class SearchBar extends Component {
               primaryText={prediction.description}
               style={{backgroundColor: selectedPrediction === index ? colors.grey200 : colors.white}}
               hoverColor={colors.white}
-              onClick={() => this.onSelectPrediction(prediction)}
+              onClick={() => this.onSelectPrediction(prediction.place_id)}
               onMouseEnter={() => this.setState({selectedPrediction: index})}
             />
           )}
@@ -122,7 +129,3 @@ export default class SearchBar extends Component {
     );
   }
 }
-
-SearchBar.propTypes = {
-  map: PropTypes.any,
-};

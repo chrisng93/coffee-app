@@ -1,10 +1,14 @@
 import {Checkbox, Toggle} from 'material-ui';
-import PropTypes from 'prop-types';
-import React from 'react';
+import * as React from 'react';
 
-const COFFEE = 'coffee';
-const STUDY = 'study';
-const GRAM = 'gram';
+import {FilterType} from '../consts';
+
+interface Props {
+  selectedFilter: FilterType;
+  openNow: boolean;
+  onSelectFilter: (filter: FilterType) => void;
+  onToggleOpenNow: () => void;
+}
 
 const renderCoffeeFilters = () =>
   <div style={{display: 'flex', flex: 1}}>
@@ -24,7 +28,7 @@ const renderCoffeeFilters = () =>
     </div>
   </div>;
 
-const Filters = ({selectedFilter, openNow, onSelectFilter, onToggleOpenNow}) =>
+const Filters = ({selectedFilter, openNow, onSelectFilter, onToggleOpenNow}: Props) =>
   <div className="filters">
     <Toggle
       label="Open Now"
@@ -38,31 +42,23 @@ const Filters = ({selectedFilter, openNow, onSelectFilter, onToggleOpenNow}) =>
         <div>
           <Checkbox
             label="Good coffee"
-            checked={selectedFilter === COFFEE}
-            onCheck={(e, isInputChecked) => onSelectFilter(isInputChecked ? COFFEE : null)}
+            checked={selectedFilter === 'coffee'}
+            onCheck={(e, isInputChecked) => onSelectFilter(isInputChecked ? 'coffee' : null)}
           />
           <Checkbox
             label="To study"
-            checked={selectedFilter === STUDY}
-            onCheck={(e, isInputChecked) => onSelectFilter(isInputChecked ? STUDY : null)}
+            checked={selectedFilter === 'study'}
+            onCheck={(e, isInputChecked) => onSelectFilter(isInputChecked ? 'study' : null)}
           />
           <Checkbox
             label="To do it for the gram"
-            checked={selectedFilter === GRAM}
-            onCheck={(e, isInputChecked) => onSelectFilter(isInputChecked ? GRAM : null)}
+            checked={selectedFilter === 'gram'}
+            onCheck={(e, isInputChecked) => onSelectFilter(isInputChecked ? 'gram' : null)}
           />
         </div>
       </div>
-      {selectedFilter === COFFEE ? renderCoffeeFilters() : null}
+      {selectedFilter === 'coffee' ? renderCoffeeFilters() : null}
     </div>
   </div>;
-
-Filters.propTypes = {
-  map: PropTypes.any,
-  selectedFilter: PropTypes.string.isRequired,
-  openNow: PropTypes.bool.isRequired,
-  onSelectFilter: PropTypes.func.isRequired,
-  onToggleOpenNow: PropTypes.func.isRequired,
-};
 
 export default Filters;

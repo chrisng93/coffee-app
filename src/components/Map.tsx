@@ -1,17 +1,28 @@
 /*eslint-disable no-undef*/
 // Need to disable no-undef for google maps definitions.
-import PropTypes from 'prop-types';
-import React, {Component} from 'react';
+import * as React from 'react';
 
-export default class Map extends Component {
-  map;
+interface Center {
+  lat: number;
+  lng: number;
+}
+
+interface Props {
+  center: Center;
+  zoom: number;
+  mapStyles?: any[];
+  setMap?: (map: google.maps.Map) => void;
+}
+
+export default class Map extends React.Component<Props, {}> {
+  map: google.maps.Map;
 
   componentDidMount() {
     const {center, zoom, mapStyles, setMap} = this.props;
     this.map = new google.maps.Map(document.getElementById('map'), {
       center,
       zoom,
-      styles: mapStyles || {},
+      styles: mapStyles || [],
       fullscreenControl: false,
     });
     if (setMap) {
@@ -29,11 +40,3 @@ export default class Map extends Component {
     );
   }
 }
-
-Map.propTypes = {
-  center: PropTypes.object.isRequired,
-  zoom: PropTypes.number.isRequired,
-  data: PropTypes.array.isRequired,
-  mapStyles: PropTypes.array,
-  setMap: PropTypes.func,
-};

@@ -2,10 +2,14 @@
   "name": "coffee-app",
   "version": "0.1.0",
   "dependencies": {
+    "@types/googlemaps": "^3.30.9",
+    "@types/material-ui": "^0.20.8",
+    "@types/react": "^16.3.17",
+    "@types/react-dom": "^16.0.6",
+    "@types/underscore": "^1.8.8",
     "material-ui": "^0.20.0",
-    "prop-types": "^15.6.1",
-    "react": "^16.3.2",
-    "react-dom": "^16.3.2",
+    "react": "^16.4.0",
+    "react-dom": "^16.4.0",
     "react-scripts": "1.1.4",
     "underscore": "^1.9.0"
   },
@@ -14,5 +18,10 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "awesome-typescript-loader": "^5.0.0",
+    "source-map-loader": "^0.2.3",
+    "typescript": "^2.9.1"
   }
 }
