@@ -1,11 +1,11 @@
-var path = require('path');
-var webpack = require('webpack');
+const path = require('path');
+const webpack = require('webpack');
 
 module.exports = {
     entry: './src/index.tsx',
     output: {
       filename: 'bundle.js',
-      path: path.resolve(__dirname, '/public'),
+      path: path.resolve(__dirname, 'public')
     },
 
     // Enable sourcemaps for debugging webpack's output.
@@ -19,10 +19,10 @@ module.exports = {
     module: {
       rules: [
         {
-          test: /\.js$/,
+          test: /.jsx?$/,
           loader: 'babel-loader',
           query: {
-            presets: ['es2015']
+            presets: ['es2015', 'react']
           }
         },
 
@@ -34,16 +34,18 @@ module.exports = {
       ]
     },
 
-    stats: {
-      colors: true
-    },
+    // // When importing a module whose path matches one of the following, just
+    // // assume a corresponding global variable exists and use that instead.
+    // // This is important because it allows us to avoid bundling all of our
+    // // dependencies, which allows browsers to cache those libraries between builds.
+    // externals: {
+    //   'react': 'React',
+    //   'react-dom': 'ReactDOM'
+    // },
 
-    // When importing a module whose path matches one of the following, just
-    // assume a corresponding global variable exists and use that instead.
-    // This is important because it allows us to avoid bundling all of our
-    // dependencies, which allows browsers to cache those libraries between builds.
-    externals: {
-      'react': 'React',
-      'react-dom': 'ReactDOM'
+    devServer: {
+      contentBase: path.join(__dirname, 'public'),
+      compress: true,
+      port: 3000
     }
 };

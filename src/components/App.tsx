@@ -17,7 +17,6 @@ interface State {
   openNow: boolean;
 }
 
-// TODO: Use typescript.
 export default class App extends React.Component<{}, State> {
   constructor(props: {}) {
     super(props);
