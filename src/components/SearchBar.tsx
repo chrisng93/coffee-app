@@ -4,12 +4,16 @@ import * as React from 'react';
 import * as _ from 'underscore';
 
 interface Props {
+  // Google Map used for places service.
   map: google.maps.Map;
 }
 
 interface State {
+  // User's search text.
   searchText: string;
+  // List of predictions given search text.
   predictions: google.maps.places.AutocompletePrediction[];
+  // Currently selected prediction. -1 if there are no predictions.
   selectedPrediction: number;
 }
 
@@ -28,9 +32,7 @@ export default class SearchBar extends React.Component<Props, State> {
   }
 
   componentWillMount() {
-    document.addEventListener('keydown', event =>
-      this.handleKeyDown(event.keyCode),
-    );
+    document.addEventListener('keydown', event => this.handleKeyDown(event.keyCode));
   }
 
   componentWillReceiveProps(nextProps: Props) {
@@ -40,9 +42,7 @@ export default class SearchBar extends React.Component<Props, State> {
   }
 
   componentWillUnmount() {
-    document.removeEventListener('keydown', event =>
-      this.handleKeyDown(event.keyCode),
-    );
+    document.removeEventListener('keydown', event => this.handleKeyDown(event.keyCode));
   }
 
   onInputChange(input: string) {
@@ -61,6 +61,7 @@ export default class SearchBar extends React.Component<Props, State> {
             console.error(`Autocomplete failure: ${status}`);
             return;
           }
+
           this.setState({
             predictions: predictions && predictions.length ? predictions : [],
           });
@@ -111,6 +112,7 @@ export default class SearchBar extends React.Component<Props, State> {
       // Enter key event, we have an actual selection.
       this.onSelectPrediction(predictions[selectedPrediction].place_id);
     } else if (keyCode === 27) {
+      // Escape key event, reset the predictions.
       this.setState({ predictions: [], selectedPrediction: -1 });
     }
   }

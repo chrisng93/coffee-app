@@ -1,5 +1,3 @@
-/*eslint-disable no-undef*/
-// Need to disable no-undef for google maps definitions.
 import * as React from 'react';
 
 interface Center {
@@ -8,9 +6,12 @@ interface Center {
 }
 
 interface Props {
+  // Center and zoom for the map.
   center: Center;
   zoom: number;
+  // Custom styles for the basemap.
   mapStyles?: any[];
+  // Method for setting the Google Map.
   setMap?: (map: google.maps.Map) => void;
 }
 
@@ -30,7 +31,7 @@ export default class Map extends React.Component<Props, {}> {
     }
   }
 
-  // TODO: Reconcile data and use it to render.
+  // TODO: Reconcile data and use it to render features on the map.
 
   render() {
     return (

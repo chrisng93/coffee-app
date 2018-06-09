@@ -10,14 +10,20 @@ import SearchBar from './SearchBar';
 const TITLE = 'Coffee App';
 
 interface Props {
+  // Map for passing down to SearchBar.
   map: google.maps.Map;
+  // Currently selected filter. Null if none.
   selectedFilter: FilterType;
+  // Whether or not "open now" filter toggled.
   openNow: boolean;
+  // Callback for when filter is selected.
   onSelectFilter: (filter: FilterType) => void;
+  // Toggle "open now" filter.
   onToggleOpenNow: () => void;
 }
 
 interface State {
+  // Whether or not filters are open.
   filtersOpen: boolean;
 }
 

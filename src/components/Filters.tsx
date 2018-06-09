@@ -4,12 +4,17 @@ import * as React from 'react';
 import { FilterType } from '../consts';
 
 interface Props {
+  // Currently selected filter. Null if none.
   selectedFilter: FilterType;
+  // Whether or not "open now" filter toggled.
   openNow: boolean;
+  // Callback for when filter is selected.
   onSelectFilter: (filter: FilterType) => void;
+  // Toggle "open now" filter.
   onToggleOpenNow: () => void;
 }
 
+// Render all options for coffee filters. Shown when coffee filter is selected.
 const renderCoffeeFilters = () => (
   <div style={{ display: 'flex', flex: 1 }}>
     <div style={{ flex: 1 }}>

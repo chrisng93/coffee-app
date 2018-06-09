@@ -11,9 +11,14 @@ const NY_VIEW = {
 };
 
 interface State {
+  // Map for passing down to SearchBar.
   map: google.maps.Map;
+  // Data for rendering features on map.
+  // TODO: Implement.
   mapData: any[];
+  // Currently selected filter. Null if none.
   selectedFilter: FilterType;
+  // Whether or not "open now" filter toggled.
   openNow: boolean;
 }
 
