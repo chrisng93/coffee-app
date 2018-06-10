@@ -3,7 +3,7 @@ import KeyboardArrowDown from 'material-ui/svg-icons/hardware/keyboard-arrow-dow
 import KeyboardArrowUp from 'material-ui/svg-icons/hardware/keyboard-arrow-up';
 import * as React from 'react';
 
-import { FilterType } from '../consts';
+import { FilterType, MapData } from '../consts';
 import Filters from './Filters';
 import SearchBar from './SearchBar';
 
@@ -16,6 +16,8 @@ interface Props {
   selectedFilter: FilterType;
   // Whether or not "open now" filter toggled.
   openNow: boolean;
+  // Add feature data to the map.
+  addMapData: (data: MapData[]) => void;
   // Callback for when filter is selected.
   onSelectFilter: (filter: FilterType) => void;
   // Toggle "open now" filter.
@@ -44,7 +46,7 @@ export default class Filter extends React.Component<Props, State> {
             <h1>{TITLE}</h1>
           </ToolbarGroup>
           <ToolbarGroup style={{ width: '50%' }}>
-            <SearchBar map={this.props.map} />
+            <SearchBar map={this.props.map} addMapData={this.props.addMapData} />
           </ToolbarGroup>
           <ToolbarGroup lastChild={true}>
             <div onClick={() => this.setState({ filtersOpen: !filtersOpen })}>

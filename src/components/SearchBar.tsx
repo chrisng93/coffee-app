@@ -3,9 +3,13 @@ import * as colors from 'material-ui/styles/colors';
 import * as React from 'react';
 import * as _ from 'underscore';
 
+import {MapData} from '../consts';
+
 interface Props {
   // Google Map used for places service.
   map: google.maps.Map;
+  // Add feature data to the map.
+  addMapData: (data: MapData[]) => void;
 }
 
 interface State {
@@ -71,7 +75,7 @@ export default class SearchBar extends React.Component<Props, State> {
   }
 
   onSelectPrediction(place_id: string) {
-    const { map } = this.props;
+    const { map, addMapData } = this.props;
     this.places.getDetails({ placeId: place_id }, (result, status) => {
       if (status !== google.maps.places.PlacesServiceStatus.OK) {
         console.error(`Places failure: ${status}`);
@@ -79,12 +83,10 @@ export default class SearchBar extends React.Component<Props, State> {
       }
 
       map.panTo(result.geometry.location);
-      const feature = new google.maps.Data.Feature({
+      addMapData([{
         id: 'search',
-        geometry: result.geometry.location,
-      });
-      // TODO: Use map's mapData to render.
-      map.data.add(feature);
+        coordinates: {lat: result.geometry.location.lat(), lng: result.geometry.location.lng()},
+      }]);
 
       this.setState({
         searchText: '',

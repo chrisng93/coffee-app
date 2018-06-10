@@ -1,8 +1,15 @@
 import * as moment from 'moment';
 
-export interface Coordinates {
+interface Coordinates {
   lat: number;
   lng: number;
+}
+
+export interface MapData {
+  id: string;
+  coordinates: Coordinates;
+  // Used when reconciling data.
+  seen?: boolean;
 }
 
 // Maps to the coffee shop model we get back from the API.

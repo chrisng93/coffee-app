@@ -1,11 +1,11 @@
 import * as React from 'react';
 import * as _ from 'underscore';
 
-import { CoffeeShop, FilterType } from '../consts';
+import { CoffeeShop, FilterType, MapData } from '../consts';
 import {getRequest} from '../fetch';
 import MAP_STYLES from '../mapStyles';
 import AppBar from './AppBar';
-import Map, {MapData} from './Map';
+import Map from './Map';
 
 const NY_VIEW = {
   center: { lat: 40.727911, lng: -73.985537 },
@@ -62,6 +62,7 @@ export default class App extends React.Component<{}, State> {
           map={map}
           selectedFilter={selectedFilter}
           openNow={openNow}
+          addMapData={data => this.setState({mapData: mapData.concat(data)})}
           onSelectFilter={this.onSelectFilter}
           onToggleOpenNow={() => this.setState({ openNow: !openNow })}
         />

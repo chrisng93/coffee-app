@@ -1,14 +1,7 @@
 import * as React from 'react';
 import * as _ from 'underscore';
 
-import {Coordinates} from '../consts';
-
-export interface MapData {
-  id: string;
-  coordinates: Coordinates;
-  // Used when reconciling data.
-  seen?: boolean;
-}
+import {MapData} from '../consts';
 
 interface Center {
   lat: number;
