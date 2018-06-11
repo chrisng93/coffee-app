@@ -76,6 +76,10 @@ export default class Map extends React.Component<Props, State> {
         } else if (!oldData.visible && data.visible) {
           this.addFeature(data);
         }
+        if (oldData.coordinates !== data.coordinates) {
+          this.removeFeature(data);
+          this.addFeature(data);
+        }
         oldData.seen = true;
       }
     });
