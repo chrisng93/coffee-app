@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as _ from 'underscore';
 
 import { CoffeeShop, FilterType, MapData } from '../consts';
-import {getRequest} from '../fetch';
+import { getRequest } from '../fetch';
 import MAP_STYLES from '../mapStyles';
 import AppBar from './AppBar';
 import Map from './Map';
@@ -42,16 +42,37 @@ export default class App extends React.Component<{}, State> {
 
   async getAndSetCoffeeShops() {
     // TODO: Don't hardcore this API URL in.
-    const coffeeShops = await getRequest<CoffeeShop[]>("http://localhost:8080/coffee_shop");
+    const coffeeShops = await getRequest<CoffeeShop[]>(
+      'http://localhost:8080/coffee_shop',
+    );
     const data: MapData[] = _.map(coffeeShops, coffeeShop => ({
-      id: coffeeShop.id.toString(),
-      coordinates: {lat: coffeeShop.coordinates.lat, lng: coffeeShop.coordinates.lng},
+      id: `coffeeshop-${coffeeShop.id.toString()}`,
+      coordinates: {
+        lat: coffeeShop.coordinates.lat,
+        lng: coffeeShop.coordinates.lng,
+      },
+      metadata: coffeeShop,
+      visible: true,
     }));
-    this.setState({mapData: this.state.mapData.concat(data)});
+    this.setState({ mapData: this.state.mapData.concat(data) });
   }
 
   onSelectFilter(selectedFilter: FilterType) {
-    this.setState({selectedFilter});
+    const mapData: MapData[] = _.map(this.state.mapData, data => {
+      if (!selectedFilter) {
+        data.visible = true;
+      } else if (selectedFilter === 'coffee') {
+        // NOTE: has_good_coffee is not implemented yet.
+        data.visible = data.metadata.has_good_coffee;
+      } else if (selectedFilter === 'study') {
+        data.visible = data.metadata.is_good_for_studying;
+      } else {
+        // NOTE: is_instagrammable is not implemented yet.
+        data.visible = data.metadata.is_instagrammable;
+      }
+      return data;
+    });
+    this.setState({ selectedFilter, mapData });
   }
 
   render() {
@@ -62,7 +83,7 @@ export default class App extends React.Component<{}, State> {
           map={map}
           selectedFilter={selectedFilter}
           openNow={openNow}
-          addMapData={data => this.setState({mapData: mapData.concat(data)})}
+          addMapData={data => this.setState({ mapData: mapData.concat(data) })}
           onSelectFilter={this.onSelectFilter}
           onToggleOpenNow={() => this.setState({ openNow: !openNow })}
         />

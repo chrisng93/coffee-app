@@ -3,7 +3,7 @@ import * as colors from 'material-ui/styles/colors';
 import * as React from 'react';
 import * as _ from 'underscore';
 
-import {MapData} from '../consts';
+import { MapData } from '../consts';
 
 interface Props {
   // Google Map used for places service.
@@ -36,7 +36,9 @@ export default class SearchBar extends React.Component<Props, State> {
   }
 
   componentWillMount() {
-    document.addEventListener('keydown', event => this.handleKeyDown(event.keyCode));
+    document.addEventListener('keydown', event =>
+      this.handleKeyDown(event.keyCode),
+    );
   }
 
   componentWillReceiveProps(nextProps: Props) {
@@ -46,7 +48,9 @@ export default class SearchBar extends React.Component<Props, State> {
   }
 
   componentWillUnmount() {
-    document.removeEventListener('keydown', event => this.handleKeyDown(event.keyCode));
+    document.removeEventListener('keydown', event =>
+      this.handleKeyDown(event.keyCode),
+    );
   }
 
   onInputChange(input: string) {
@@ -83,10 +87,16 @@ export default class SearchBar extends React.Component<Props, State> {
       }
 
       map.panTo(result.geometry.location);
-      addMapData([{
-        id: 'search',
-        coordinates: {lat: result.geometry.location.lat(), lng: result.geometry.location.lng()},
-      }]);
+      addMapData([
+        {
+          id: 'search',
+          coordinates: {
+            lat: result.geometry.location.lat(),
+            lng: result.geometry.location.lng(),
+          },
+          visible: true,
+        },
+      ]);
 
       this.setState({
         searchText: '',

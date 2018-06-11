@@ -46,7 +46,10 @@ export default class Filter extends React.Component<Props, State> {
             <h1>{TITLE}</h1>
           </ToolbarGroup>
           <ToolbarGroup style={{ width: '50%' }}>
-            <SearchBar map={this.props.map} addMapData={this.props.addMapData} />
+            <SearchBar
+              map={this.props.map}
+              addMapData={this.props.addMapData}
+            />
           </ToolbarGroup>
           <ToolbarGroup lastChild={true}>
             <div onClick={() => this.setState({ filtersOpen: !filtersOpen })}>

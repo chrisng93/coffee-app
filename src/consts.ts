@@ -8,6 +8,10 @@ interface Coordinates {
 export interface MapData {
   id: string;
   coordinates: Coordinates;
+  // Whether or not the data should be shown on the map.
+  visible: boolean;
+  // Metadata associated with data point. For example, this could be the CoffeeShop object.
+  metadata?: { [key: string]: any };
   // Used when reconciling data.
   seen?: boolean;
 }
