@@ -1,10 +1,11 @@
 import * as React from 'react';
 import * as _ from 'underscore';
 
-import { CoffeeShop, FilterType, MapData } from '../consts';
+import { CoffeeShopModel, FilterType, MapData } from '../consts';
 import { getRequest } from '../fetch';
 import MAP_STYLES from '../mapStyles';
 import AppBar from './AppBar';
+import CoffeeShop from './CoffeeShop';
 import Map from './Map';
 
 const NY_VIEW = {
@@ -21,7 +22,7 @@ interface State {
   // Currently selected filter. Null if none.
   selectedFilter: FilterType;
   // Selected coffee shop (if any).
-  selectedCoffeeShop: CoffeeShop;
+  selectedCoffeeShop: CoffeeShopModel;
 }
 
 export default class App extends React.Component<{}, State> {
@@ -48,7 +49,7 @@ export default class App extends React.Component<{}, State> {
 
   async getAndSetCoffeeShops() {
     // TODO: Don't hardcore this API URL in.
-    const coffeeShops = await getRequest<CoffeeShop[]>(
+    const coffeeShops = await getRequest<CoffeeShopModel[]>(
       'http://localhost:8080/coffee_shop',
     );
     const data: MapData[] = _.map(coffeeShops, coffeeShop => ({
@@ -87,11 +88,12 @@ export default class App extends React.Component<{}, State> {
 
   onFeatureClick(event: google.maps.Data.MouseEvent) {
     this.state.map.panTo(event.latLng);
+    // TODO: Call API to get single coffee shop info.
     this.setState({selectedCoffeeShop: event.feature.getProperty('metadata')});
   }
 
   render() {
-    const { map, mapData, selectedFilter } = this.state;
+    const { map, mapData, selectedFilter, selectedCoffeeShop } = this.state;
     return (
       <div>
         <AppBar
@@ -100,6 +102,12 @@ export default class App extends React.Component<{}, State> {
           addMapData={data => this.setNewMapData(mapData, data)}
           onSelectFilter={this.onSelectFilter}
         />
+        {selectedCoffeeShop
+          ? <CoffeeShop
+              coffeeShop={selectedCoffeeShop}
+              onCloseDialog={() => this.setState({selectedCoffeeShop: null})}
+            />
+          : null}
         <Map
           setMap={this.setMap}
           {...NY_VIEW}

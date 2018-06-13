@@ -17,7 +17,7 @@ export interface MapData {
 }
 
 // Maps to the coffee shop model we get back from the API.
-export interface CoffeeShop {
+export interface CoffeeShopModel {
   id: number;
   last_updated: moment.Moment;
   name: string;
