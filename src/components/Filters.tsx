@@ -6,12 +6,8 @@ import { FilterType } from '../consts';
 interface Props {
   // Currently selected filter. Null if none.
   selectedFilter: FilterType;
-  // Whether or not "open now" filter toggled.
-  openNow: boolean;
   // Callback for when filter is selected.
   onSelectFilter: (filter: FilterType) => void;
-  // Toggle "open now" filter.
-  onToggleOpenNow: () => void;
 }
 
 // Render all options for coffee filters. Shown when coffee filter is selected.
@@ -34,19 +30,8 @@ const renderCoffeeFilters = () => (
   </div>
 );
 
-const Filters = ({
-  selectedFilter,
-  openNow,
-  onSelectFilter,
-  onToggleOpenNow,
-}: Props) => (
+const Filters = ({selectedFilter, onSelectFilter}: Props) => (
   <div className="filters">
-    <Toggle
-      label="Open Now"
-      toggled={openNow}
-      onToggle={onToggleOpenNow}
-      style={{ width: 'auto' }}
-    />
     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
       <div style={{ flex: 1 }}>
         <h2>I want...</h2>

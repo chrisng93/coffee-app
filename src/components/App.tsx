@@ -20,8 +20,8 @@ interface State {
   mapData: MapData[];
   // Currently selected filter. Null if none.
   selectedFilter: FilterType;
-  // Whether or not "open now" filter toggled.
-  openNow: boolean;
+  // Selected coffee shop (if any).
+  selectedCoffeeShop: CoffeeShop;
 }
 
 export default class App extends React.Component<{}, State> {
@@ -31,13 +31,19 @@ export default class App extends React.Component<{}, State> {
       map: null,
       mapData: [],
       selectedFilter: null,
-      openNow: false,
+      selectedCoffeeShop: null,
     };
     this.onSelectFilter = this.onSelectFilter.bind(this);
+    this.setMap = this.setMap.bind(this);
+    this.onFeatureClick = this.onFeatureClick.bind(this);
   }
 
   componentDidMount() {
     this.getAndSetCoffeeShops();
+  }
+
+  setNewMapData(currentMapData: MapData[], additionalMapData: MapData[]) {
+    this.setState({mapData: currentMapData.concat(additionalMapData)});
   }
 
   async getAndSetCoffeeShops() {
@@ -54,7 +60,7 @@ export default class App extends React.Component<{}, State> {
       metadata: coffeeShop,
       visible: true,
     }));
-    this.setState({ mapData: this.state.mapData.concat(data) });
+    this.setNewMapData(this.state.mapData, data);
   }
 
   onSelectFilter(selectedFilter: FilterType) {
@@ -75,23 +81,31 @@ export default class App extends React.Component<{}, State> {
     this.setState({ selectedFilter, mapData });
   }
 
+  setMap(newMap: google.maps.Map) {
+    this.setState({ map: newMap });
+  }
+
+  onFeatureClick(event: google.maps.Data.MouseEvent) {
+    this.state.map.panTo(event.latLng);
+    this.setState({selectedCoffeeShop: event.feature.getProperty('metadata')});
+  }
+
   render() {
-    const { map, mapData, selectedFilter, openNow } = this.state;
+    const { map, mapData, selectedFilter } = this.state;
     return (
       <div>
         <AppBar
           map={map}
           selectedFilter={selectedFilter}
-          openNow={openNow}
-          addMapData={data => this.setState({ mapData: mapData.concat(data) })}
+          addMapData={data => this.setNewMapData(mapData, data)}
           onSelectFilter={this.onSelectFilter}
-          onToggleOpenNow={() => this.setState({ openNow: !openNow })}
         />
         <Map
-          setMap={(newMap: google.maps.Map) => this.setState({ map: newMap })}
+          setMap={this.setMap}
           {...NY_VIEW}
           mapStyles={MAP_STYLES}
           mapData={mapData}
+          onFeatureClick={this.onFeatureClick}
         />
       </div>
     );

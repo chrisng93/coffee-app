@@ -16,6 +16,7 @@ interface Props {
   mapData: MapData[];
   // Custom styles for the basemap.
   mapStyles?: any[];
+  onFeatureClick?: (event: google.maps.Data.MouseEvent) => void;
   // Method for setting the Google Map.
   setMap?: (map: google.maps.Map) => void;
 }
@@ -35,7 +36,7 @@ export default class Map extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    const { center, zoom, mapStyles, mapData, setMap } = this.props;
+    const { center, zoom, mapStyles, mapData, onFeatureClick, setMap } = this.props;
     this.map = new google.maps.Map(document.getElementById('map'), {
       center,
       zoom,
@@ -48,6 +49,9 @@ export default class Map extends React.Component<Props, State> {
     });
     if (setMap) {
       setMap(this.map);
+    }
+    if (onFeatureClick) {
+      this.map.data.addListener('click', onFeatureClick);
     }
     this.reconcileData(mapData);
   }
@@ -107,6 +111,7 @@ export default class Map extends React.Component<Props, State> {
         data.coordinates.lat,
         data.coordinates.lng,
       ),
+      properties: {metadata: data.metadata},
     });
     this.map.data.add(feature);
   }

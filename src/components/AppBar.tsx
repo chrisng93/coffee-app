@@ -14,14 +14,10 @@ interface Props {
   map: google.maps.Map;
   // Currently selected filter. Null if none.
   selectedFilter: FilterType;
-  // Whether or not "open now" filter toggled.
-  openNow: boolean;
   // Add feature data to the map.
   addMapData: (data: MapData[]) => void;
   // Callback for when filter is selected.
   onSelectFilter: (filter: FilterType) => void;
-  // Toggle "open now" filter.
-  onToggleOpenNow: () => void;
 }
 
 interface State {
