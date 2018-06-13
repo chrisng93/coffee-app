@@ -44,7 +44,7 @@ export default class App extends React.Component<{}, State> {
   }
 
   setNewMapData(currentMapData: MapData[], additionalMapData: MapData[]) {
-    this.setState({mapData: currentMapData.concat(additionalMapData)});
+    this.setState({ mapData: currentMapData.concat(additionalMapData) });
   }
 
   async getAndSetCoffeeShops() {
@@ -89,7 +89,9 @@ export default class App extends React.Component<{}, State> {
   onFeatureClick(event: google.maps.Data.MouseEvent) {
     this.state.map.panTo(event.latLng);
     // TODO: Call API to get single coffee shop info.
-    this.setState({selectedCoffeeShop: event.feature.getProperty('metadata')});
+    this.setState({
+      selectedCoffeeShop: event.feature.getProperty('metadata'),
+    });
   }
 
   render() {
@@ -102,12 +104,12 @@ export default class App extends React.Component<{}, State> {
           addMapData={data => this.setNewMapData(mapData, data)}
           onSelectFilter={this.onSelectFilter}
         />
-        {selectedCoffeeShop
-          ? <CoffeeShop
-              coffeeShop={selectedCoffeeShop}
-              onCloseDialog={() => this.setState({selectedCoffeeShop: null})}
-            />
-          : null}
+        {selectedCoffeeShop ? (
+          <CoffeeShop
+            coffeeShop={selectedCoffeeShop}
+            onCloseDialog={() => this.setState({ selectedCoffeeShop: null })}
+          />
+        ) : null}
         <Map
           setMap={this.setMap}
           {...NY_VIEW}

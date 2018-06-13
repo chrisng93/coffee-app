@@ -36,7 +36,14 @@ export default class Map extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    const { center, zoom, mapStyles, mapData, onFeatureClick, setMap } = this.props;
+    const {
+      center,
+      zoom,
+      mapStyles,
+      mapData,
+      onFeatureClick,
+      setMap,
+    } = this.props;
     this.map = new google.maps.Map(document.getElementById('map'), {
       center,
       zoom,
@@ -68,7 +75,7 @@ export default class Map extends React.Component<Props, State> {
     _.each(newData, data => {
       // Need to create a copy of the data, otherwise the data in the mapping gets mutated
       // immediately when new props are sent in. (Objects in JS are passed by reference)
-      newIDToMapData[data.id] = {...data};
+      newIDToMapData[data.id] = { ...data };
 
       // This is a new data point - add it to the map.
       if (!(data.id in oldIDToMapData)) {
@@ -111,7 +118,7 @@ export default class Map extends React.Component<Props, State> {
         data.coordinates.lat,
         data.coordinates.lng,
       ),
-      properties: {metadata: data.metadata},
+      properties: { metadata: data.metadata },
     });
     this.map.data.add(feature);
   }

@@ -30,7 +30,7 @@ const renderCoffeeFilters = () => (
   </div>
 );
 
-const Filters = ({selectedFilter, onSelectFilter}: Props) => (
+const Filters = ({ selectedFilter, onSelectFilter }: Props) => (
   <div className="filters">
     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
       <div style={{ flex: 1 }}>

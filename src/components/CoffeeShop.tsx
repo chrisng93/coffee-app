@@ -1,4 +1,4 @@
-import {Dialog} from 'material-ui';
+import { Dialog } from 'material-ui';
 import * as React from 'react';
 
 import { CoffeeShopModel } from '../consts';
@@ -10,12 +10,10 @@ interface Props {
   onCloseDialog: () => void;
 }
 
-const CoffeeShop = ({coffeeShop, onCloseDialog}: Props) =>
-  <Dialog
-    open={coffeeShop !== null}
-    onRequestClose={onCloseDialog}
-  >
+const CoffeeShop = ({ coffeeShop, onCloseDialog }: Props) => (
+  <Dialog open={coffeeShop !== null} onRequestClose={onCloseDialog}>
     Coffee Shop
-  </Dialog>;
+  </Dialog>
+);
 
 export default CoffeeShop;
