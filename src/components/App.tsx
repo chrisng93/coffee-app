@@ -108,11 +108,17 @@ export default class App extends React.Component<{}, State> {
       });
       this.onSelectFilter(this.state.selectedFilter, mapData);
     }
-    this.setState({walkingRadiusOptions});
+    this.setState({ walkingRadiusOptions });
   }
 
   render() {
-    const { map, mapData, walkingRadiusOptions, selectedFilter, selectedCoffeeShop } = this.state;
+    const {
+      map,
+      mapData,
+      walkingRadiusOptions,
+      selectedFilter,
+      selectedCoffeeShop,
+    } = this.state;
     return (
       <div>
         <AppBar

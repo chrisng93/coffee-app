@@ -23,7 +23,8 @@ interface State {
   selectedPrediction: number;
 }
 
-const findRadius = (timeMin: number) => METERS_PER_HOUR_WALKING_SPEED_MANHATTAN * timeMin * 1/60;
+const findRadius = (timeMin: number) =>
+  (METERS_PER_HOUR_WALKING_SPEED_MANHATTAN * timeMin * 1) / 60;
 
 export default class SearchBar extends React.Component<Props, State> {
   private autocomplete: google.maps.places.AutocompleteService; // Google autocomplete service.
@@ -85,36 +86,39 @@ export default class SearchBar extends React.Component<Props, State> {
 
   onSelectPrediction(selection: google.maps.places.AutocompletePrediction) {
     const { map, addMapData, setWalkingRadius } = this.props;
-    this.places.getDetails({ placeId: selection.place_id }, (result, status) => {
-      if (status !== google.maps.places.PlacesServiceStatus.OK) {
-        console.error(`Places failure: ${status}`);
-        return;
-      }
+    this.places.getDetails(
+      { placeId: selection.place_id },
+      (result, status) => {
+        if (status !== google.maps.places.PlacesServiceStatus.OK) {
+          console.error(`Places failure: ${status}`);
+          return;
+        }
 
-      map.panTo(result.geometry.location);
-      addMapData([
-        {
-          id: 'search',
-          coordinates: {
-            lat: result.geometry.location.lat(),
-            lng: result.geometry.location.lng(),
+        map.panTo(result.geometry.location);
+        addMapData([
+          {
+            id: 'search',
+            coordinates: {
+              lat: result.geometry.location.lat(),
+              lng: result.geometry.location.lng(),
+            },
+            visible: true,
           },
-          visible: true,
-        },
-      ]);
-      setWalkingRadius({
-        strokeColor: '#607D8B',
-        fillColor: '#B0BEC5',
-        radius: findRadius(5),
-        center: result.geometry.location,
-      });
+        ]);
+        setWalkingRadius({
+          strokeColor: '#607D8B',
+          fillColor: '#B0BEC5',
+          radius: findRadius(5),
+          center: result.geometry.location,
+        });
 
-      this.setState({
-        searchText: selection.description.toLowerCase(),
-        predictions: [],
-        selectedPrediction: -1,
-      });
-    });
+        this.setState({
+          searchText: selection.description.toLowerCase(),
+          predictions: [],
+          selectedPrediction: -1,
+        });
+      },
+    );
   }
 
   handleKeyDown(keyCode: number) {
@@ -142,7 +146,7 @@ export default class SearchBar extends React.Component<Props, State> {
 
   clearSearch() {
     this.props.setWalkingRadius(null);
-    this.setState({searchText: '', predictions: [], selectedPrediction: -1});
+    this.setState({ searchText: '', predictions: [], selectedPrediction: -1 });
   }
 
   render() {
@@ -159,10 +163,12 @@ export default class SearchBar extends React.Component<Props, State> {
             style={{ height: '100%', lineHeight: '16px' }}
             hintStyle={{ paddingLeft: '24px' }}
             inputStyle={{ paddingLeft: '24px' }}
-            />
-          {searchText
-            ? <div className="search-text-delete" onClick={this.clearSearch}>x</div>
-            : null}
+          />
+          {searchText ? (
+            <div className="search-text-delete" onClick={this.clearSearch}>
+              x
+            </div>
+          ) : null}
         </div>
         <List>
           {_.map(predictions, (prediction, index) => (

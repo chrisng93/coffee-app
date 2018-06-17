@@ -36,7 +36,7 @@ export default class Filter extends React.Component<Props, State> {
   }
 
   render() {
-    const {map, addMapData, setWalkingRadius} = this.props;
+    const { map, addMapData, setWalkingRadius } = this.props;
     const { filtersOpen } = this.state;
     return (
       <div>

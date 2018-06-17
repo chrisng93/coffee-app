@@ -68,14 +68,19 @@ export default class Map extends React.Component<Props, State> {
   }
 
   componentWillReceiveProps(nextProps: Props) {
-    if (this.props.mapData !== nextProps.mapData ||
-        this.props.walkingRadiusOptions !== nextProps.walkingRadiusOptions) {
+    if (
+      this.props.mapData !== nextProps.mapData ||
+      this.props.walkingRadiusOptions !== nextProps.walkingRadiusOptions
+    ) {
       this.reconcileData(nextProps.mapData, nextProps.walkingRadiusOptions);
     }
   }
 
-  reconcileData(newData: MapData[], walkingRadiusOptions: google.maps.CircleOptions) {
-    const {idToMapData, walkingRadius} = this.state;
+  reconcileData(
+    newData: MapData[],
+    walkingRadiusOptions: google.maps.CircleOptions,
+  ) {
+    const { idToMapData, walkingRadius } = this.state;
     const oldIDToMapData = { ...idToMapData };
     const newIDToMapData: { [id: string]: MapData } = {};
 
@@ -97,11 +102,15 @@ export default class Map extends React.Component<Props, State> {
       }
     }
 
-    const walkingRadiusBounds = newWalkingRadius && newWalkingRadius.getBounds();
+    const walkingRadiusBounds =
+      newWalkingRadius && newWalkingRadius.getBounds();
     _.each(newData, data => {
       // We need to set visibility for each feature in the map component since we need to get the
       // bounds of the walking radius in order to determine visibility.
-      if (walkingRadiusBounds && !walkingRadiusBounds.contains(data.coordinates)) {
+      if (
+        walkingRadiusBounds &&
+        !walkingRadiusBounds.contains(data.coordinates)
+      ) {
         data.visible = false;
       }
       // Need to create a copy of the data, otherwise the data in the mapping gets mutated
@@ -113,12 +122,15 @@ export default class Map extends React.Component<Props, State> {
         this.addData(data);
       } else {
         const oldData = oldIDToMapData[data.id];
-        if (oldData.visible && !data.visible) { // Remove data if it should no longer be visible.
+        if (oldData.visible && !data.visible) {
+          // Remove data if it should no longer be visible.
           this.removeData(data);
-        } else if (!oldData.visible && data.visible) { // Add data if it should be visible.
+        } else if (!oldData.visible && data.visible) {
+          // Add data if it should be visible.
           this.addData(data);
         }
-        if (oldData.coordinates !== data.coordinates) { // Re-render data if coordinates changed.
+        if (oldData.coordinates !== data.coordinates) {
+          // Re-render data if coordinates changed.
           this.removeData(data);
           this.addData(data);
         }
@@ -138,7 +150,10 @@ export default class Map extends React.Component<Props, State> {
     // If there's a walking radius, filter out (set visibility) coffee shops that are outside of
     // the radius.
 
-    this.setState({ idToMapData: newIDToMapData, walkingRadius: newWalkingRadius });
+    this.setState({
+      idToMapData: newIDToMapData,
+      walkingRadius: newWalkingRadius,
+    });
   }
 
   addData(data: MapData) {
@@ -164,17 +179,24 @@ export default class Map extends React.Component<Props, State> {
     }
   }
 
-  filterForWalkingRadius(oldData: { [id: string]: MapData }, newData: { [id: string]: MapData }) {
-    const {walkingRadius} = this.state;
+  filterForWalkingRadius(
+    oldData: { [id: string]: MapData },
+    newData: { [id: string]: MapData },
+  ) {
+    const { walkingRadius } = this.state;
     if (walkingRadius) {
       _.each(newData, (data, id) => {
-        const {coordinates: {lat, lng}} = data;
-        if (!walkingRadius.getBounds().contains(new google.maps.LatLng(lat, lng))) {
-          console.log('not visible')
+        const {
+          coordinates: { lat, lng },
+        } = data;
+        if (
+          !walkingRadius.getBounds().contains(new google.maps.LatLng(lat, lng))
+        ) {
+          console.log('not visible');
           newData[id].visible = false;
         }
       });
-      this.setState({idToMapData: newData});
+      this.setState({ idToMapData: newData });
     }
   }
 
