@@ -17,12 +17,13 @@ interface State {
   // Map for passing down to SearchBar.
   map: google.maps.Map;
   // Data for rendering features on map.
-  // TODO: Implement.
   mapData: MapData[];
   // Currently selected filter. Null if none.
   selectedFilter: FilterType;
   // Selected coffee shop (if any).
   selectedCoffeeShop: CoffeeShopModel;
+  // Options for rendering the walking radius.
+  walkingRadiusOptions: google.maps.CircleOptions;
 }
 
 export default class App extends React.Component<{}, State> {
@@ -33,10 +34,12 @@ export default class App extends React.Component<{}, State> {
       mapData: [],
       selectedFilter: null,
       selectedCoffeeShop: null,
+      walkingRadiusOptions: null,
     };
-    this.onSelectFilter = this.onSelectFilter.bind(this);
     this.setMap = this.setMap.bind(this);
     this.onFeatureClick = this.onFeatureClick.bind(this);
+    this.addMapData = this.addMapData.bind(this);
+    this.setWalkingRadius = this.setWalkingRadius.bind(this);
   }
 
   componentDidMount() {
@@ -64,8 +67,8 @@ export default class App extends React.Component<{}, State> {
     this.setNewMapData(this.state.mapData, data);
   }
 
-  onSelectFilter(selectedFilter: FilterType) {
-    const mapData: MapData[] = _.map(this.state.mapData, data => {
+  onSelectFilter(selectedFilter: FilterType, mapData: MapData[]) {
+    const newMapData: MapData[] = _.map(mapData, data => {
       if (!selectedFilter) {
         data.visible = true;
       } else if (selectedFilter === 'coffee') {
@@ -79,7 +82,7 @@ export default class App extends React.Component<{}, State> {
       }
       return data;
     });
-    this.setState({ selectedFilter, mapData });
+    this.setState({ selectedFilter, mapData: newMapData });
   }
 
   setMap(newMap: google.maps.Map) {
@@ -87,22 +90,37 @@ export default class App extends React.Component<{}, State> {
   }
 
   onFeatureClick(event: google.maps.Data.MouseEvent) {
-    this.state.map.panTo(event.latLng);
     // TODO: Call API to get single coffee shop info.
     this.setState({
       selectedCoffeeShop: event.feature.getProperty('metadata'),
     });
   }
 
+  addMapData(data: MapData[]) {
+    this.setNewMapData(this.state.mapData, data);
+  }
+
+  setWalkingRadius(walkingRadiusOptions: google.maps.CircleOptions) {
+    if (!walkingRadiusOptions) {
+      const mapData = _.map(this.state.mapData, data => {
+        data.visible = true;
+        return data;
+      });
+      this.onSelectFilter(this.state.selectedFilter, mapData);
+    }
+    this.setState({walkingRadiusOptions});
+  }
+
   render() {
-    const { map, mapData, selectedFilter, selectedCoffeeShop } = this.state;
+    const { map, mapData, walkingRadiusOptions, selectedFilter, selectedCoffeeShop } = this.state;
     return (
       <div>
         <AppBar
           map={map}
           selectedFilter={selectedFilter}
-          addMapData={data => this.setNewMapData(mapData, data)}
-          onSelectFilter={this.onSelectFilter}
+          addMapData={this.addMapData}
+          setWalkingRadius={this.setWalkingRadius}
+          onSelectFilter={filter => this.onSelectFilter(filter, mapData)}
         />
         {selectedCoffeeShop ? (
           <CoffeeShop
@@ -115,6 +133,7 @@ export default class App extends React.Component<{}, State> {
           {...NY_VIEW}
           mapStyles={MAP_STYLES}
           mapData={mapData}
+          walkingRadiusOptions={walkingRadiusOptions}
           onFeatureClick={this.onFeatureClick}
         />
       </div>

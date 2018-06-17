@@ -7,7 +7,7 @@ import { FilterType, MapData } from '../consts';
 import Filters from './Filters';
 import SearchBar from './SearchBar';
 
-const TITLE = 'Coffee App';
+const TITLE = 'Coffee Around Me';
 
 interface Props {
   // Map for passing down to SearchBar.
@@ -16,6 +16,8 @@ interface Props {
   selectedFilter: FilterType;
   // Add feature data to the map.
   addMapData: (data: MapData[]) => void;
+  // Add walking radius to map.
+  setWalkingRadius: (walkingRadiusOptions: google.maps.CircleOptions) => void;
   // Callback for when filter is selected.
   onSelectFilter: (filter: FilterType) => void;
 }
@@ -34,6 +36,7 @@ export default class Filter extends React.Component<Props, State> {
   }
 
   render() {
+    const {map, addMapData, setWalkingRadius} = this.props;
     const { filtersOpen } = this.state;
     return (
       <div>
@@ -43,8 +46,9 @@ export default class Filter extends React.Component<Props, State> {
           </ToolbarGroup>
           <ToolbarGroup style={{ width: '50%' }}>
             <SearchBar
-              map={this.props.map}
-              addMapData={this.props.addMapData}
+              map={map}
+              addMapData={addMapData}
+              setWalkingRadius={setWalkingRadius}
             />
           </ToolbarGroup>
           <ToolbarGroup lastChild={true}>

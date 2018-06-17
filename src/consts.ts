@@ -1,5 +1,8 @@
 import * as moment from 'moment';
 
+// Google Maps' circle radius requires meters, so we have average walking speed in meters per hour.
+export const METERS_PER_HOUR_WALKING_SPEED_MANHATTAN = 7242;
+
 interface Coordinates {
   lat: number;
   lng: number;
@@ -10,6 +13,7 @@ export interface MapData {
   coordinates: Coordinates;
   // Whether or not the data should be shown on the map.
   visible: boolean;
+  walkingRadiusOptions?: { [key: string]: any };
   // Metadata associated with data point. For example, this could be the CoffeeShop object.
   metadata?: { [key: string]: any };
   // Used when reconciling data.

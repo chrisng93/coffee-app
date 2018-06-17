@@ -3,13 +3,15 @@ import * as colors from 'material-ui/styles/colors';
 import * as React from 'react';
 import * as _ from 'underscore';
 
-import { MapData } from '../consts';
+import { MapData, METERS_PER_HOUR_WALKING_SPEED_MANHATTAN } from '../consts';
 
 interface Props {
   // Google Map used for places service.
   map: google.maps.Map;
   // Add feature data to the map.
   addMapData: (data: MapData[]) => void;
+  // Add walking radius to map.
+  setWalkingRadius: (walkingRadiusOptions: google.maps.CircleOptions) => void;
 }
 
 interface State {
@@ -20,6 +22,8 @@ interface State {
   // Currently selected prediction. -1 if there are no predictions.
   selectedPrediction: number;
 }
+
+const findRadius = (timeMin: number) => METERS_PER_HOUR_WALKING_SPEED_MANHATTAN * timeMin * 1/60;
 
 export default class SearchBar extends React.Component<Props, State> {
   private autocomplete: google.maps.places.AutocompleteService; // Google autocomplete service.
@@ -33,6 +37,7 @@ export default class SearchBar extends React.Component<Props, State> {
       selectedPrediction: -1,
     };
     this.autocomplete = new google.maps.places.AutocompleteService();
+    this.clearSearch = this.clearSearch.bind(this);
   }
 
   componentWillMount() {
@@ -78,9 +83,9 @@ export default class SearchBar extends React.Component<Props, State> {
     });
   }
 
-  onSelectPrediction(place_id: string) {
-    const { map, addMapData } = this.props;
-    this.places.getDetails({ placeId: place_id }, (result, status) => {
+  onSelectPrediction(selection: google.maps.places.AutocompletePrediction) {
+    const { map, addMapData, setWalkingRadius } = this.props;
+    this.places.getDetails({ placeId: selection.place_id }, (result, status) => {
       if (status !== google.maps.places.PlacesServiceStatus.OK) {
         console.error(`Places failure: ${status}`);
         return;
@@ -97,9 +102,15 @@ export default class SearchBar extends React.Component<Props, State> {
           visible: true,
         },
       ]);
+      setWalkingRadius({
+        strokeColor: '#607D8B',
+        fillColor: '#B0BEC5',
+        radius: findRadius(5),
+        center: result.geometry.location,
+      });
 
       this.setState({
-        searchText: '',
+        searchText: selection.description.toLowerCase(),
         predictions: [],
         selectedPrediction: -1,
       });
@@ -122,27 +133,37 @@ export default class SearchBar extends React.Component<Props, State> {
       this.setState({ selectedPrediction });
     } else if (keyCode === 13 && selectedPrediction > -1) {
       // Enter key event, we have an actual selection.
-      this.onSelectPrediction(predictions[selectedPrediction].place_id);
+      this.onSelectPrediction(predictions[selectedPrediction]);
     } else if (keyCode === 27) {
       // Escape key event, reset the predictions.
       this.setState({ predictions: [], selectedPrediction: -1 });
     }
   }
 
+  clearSearch() {
+    this.props.setWalkingRadius(null);
+    this.setState({searchText: '', predictions: [], selectedPrediction: -1});
+  }
+
   render() {
     const { searchText, predictions, selectedPrediction } = this.state;
     return (
       <div className="search-bar">
-        <TextField
-          value={searchText}
-          hintText="Search"
-          onChange={(event, val) => this.onInputChange(val)}
-          underlineShow={false}
-          fullWidth={true}
-          style={{ height: '100%', lineHeight: '16px' }}
-          hintStyle={{ paddingLeft: '24px' }}
-          inputStyle={{ paddingLeft: '24px' }}
-        />
+        <div className="search-text-wrapper">
+          <TextField
+            value={searchText}
+            hintText="Search"
+            onChange={(event, val) => this.onInputChange(val)}
+            underlineShow={false}
+            fullWidth={true}
+            style={{ height: '100%', lineHeight: '16px' }}
+            hintStyle={{ paddingLeft: '24px' }}
+            inputStyle={{ paddingLeft: '24px' }}
+            />
+          {searchText
+            ? <div className="search-text-delete" onClick={this.clearSearch}>x</div>
+            : null}
+        </div>
         <List>
           {_.map(predictions, (prediction, index) => (
             <ListItem
@@ -153,7 +174,7 @@ export default class SearchBar extends React.Component<Props, State> {
                   selectedPrediction === index ? colors.grey200 : colors.white,
               }}
               hoverColor={colors.white}
-              onClick={() => this.onSelectPrediction(prediction.place_id)}
+              onClick={() => this.onSelectPrediction(prediction)}
               onMouseEnter={() => this.setState({ selectedPrediction: index })}
             />
           ))}

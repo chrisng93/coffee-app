@@ -39,6 +39,23 @@ body {
   z-index: 2;
 }
 
+.search-text-wrapper {
+  height: 100%;
+  width: 100%;
+  display: flex;
+}
+
+.search-text-delete {
+  margin-left: -20px;
+  display: flex;
+  align-items: center;
+  z-index: 1;
+}
+
+.search-text-delete:hover {
+  cursor: default;
+}
+
 .filters {
   position: absolute;
   top: 64px;
