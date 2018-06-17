@@ -3,7 +3,7 @@ import KeyboardArrowDown from 'material-ui/svg-icons/hardware/keyboard-arrow-dow
 import KeyboardArrowUp from 'material-ui/svg-icons/hardware/keyboard-arrow-up';
 import * as React from 'react';
 
-import { FilterType, MapData } from '../consts';
+import { FilterType, MapData } from '../types';
 import Filters from './Filters';
 import SearchBar from './SearchBar';
 
@@ -16,8 +16,6 @@ interface Props {
   selectedFilter: FilterType;
   // Add feature data to the map.
   addMapData: (data: MapData[]) => void;
-  // Add walking radius to map.
-  setWalkingRadius: (walkingRadiusOptions: google.maps.CircleOptions) => void;
   // Callback for when filter is selected.
   onSelectFilter: (filter: FilterType) => void;
 }
@@ -25,6 +23,8 @@ interface Props {
 interface State {
   // Whether or not filters are open.
   filtersOpen: boolean;
+  // Time in min that the user wants to walk to get coffee.
+  walkingTimeMin: number;
 }
 
 export default class Filter extends React.Component<Props, State> {
@@ -32,12 +32,13 @@ export default class Filter extends React.Component<Props, State> {
     super(props);
     this.state = {
       filtersOpen: false,
+      walkingTimeMin: 10,
     };
   }
 
   render() {
-    const { map, addMapData, setWalkingRadius } = this.props;
-    const { filtersOpen } = this.state;
+    const { map, addMapData } = this.props;
+    const { filtersOpen, walkingTimeMin } = this.state;
     return (
       <div>
         <Toolbar className="app-bar">
@@ -48,7 +49,7 @@ export default class Filter extends React.Component<Props, State> {
             <SearchBar
               map={map}
               addMapData={addMapData}
-              setWalkingRadius={setWalkingRadius}
+              walkingTimeMin={walkingTimeMin}
             />
           </ToolbarGroup>
           <ToolbarGroup lastChild={true}>
@@ -57,7 +58,12 @@ export default class Filter extends React.Component<Props, State> {
             </div>
           </ToolbarGroup>
         </Toolbar>
-        {filtersOpen ? <Filters {...this.props} /> : null}
+        {filtersOpen
+            ? <Filters
+                {...this.props}
+                setWalkingTime={(newWalkingTimeMin: number) => this.setState({walkingTimeMin: newWalkingTimeMin})}
+              />
+            : null}
       </div>
     );
   }

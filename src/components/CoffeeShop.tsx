@@ -1,7 +1,7 @@
 import { Dialog } from 'material-ui';
 import * as React from 'react';
 
-import { CoffeeShopModel } from '../consts';
+import { CoffeeShopModel } from '../types';
 
 interface Props {
   // Coffee shop to render.

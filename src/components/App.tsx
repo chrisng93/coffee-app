@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as _ from 'underscore';
 
-import { CoffeeShopModel, FilterType, MapData } from '../consts';
+import { CoffeeShopModel, FilterType, MapData } from '../types';
 import { getRequest } from '../fetch';
 import MAP_STYLES from '../mapStyles';
 import AppBar from './AppBar';
@@ -22,8 +22,6 @@ interface State {
   selectedFilter: FilterType;
   // Selected coffee shop (if any).
   selectedCoffeeShop: CoffeeShopModel;
-  // Options for rendering the walking radius.
-  walkingRadiusOptions: google.maps.CircleOptions;
 }
 
 export default class App extends React.Component<{}, State> {
@@ -34,12 +32,10 @@ export default class App extends React.Component<{}, State> {
       mapData: [],
       selectedFilter: null,
       selectedCoffeeShop: null,
-      walkingRadiusOptions: null,
     };
     this.setMap = this.setMap.bind(this);
     this.onFeatureClick = this.onFeatureClick.bind(this);
     this.addMapData = this.addMapData.bind(this);
-    this.setWalkingRadius = this.setWalkingRadius.bind(this);
   }
 
   componentDidMount() {
@@ -51,20 +47,21 @@ export default class App extends React.Component<{}, State> {
   }
 
   async getAndSetCoffeeShops() {
-    // TODO: Don't hardcore this API URL in.
-    const coffeeShops = await getRequest<CoffeeShopModel[]>(
-      'http://localhost:8080/coffee_shop',
-    );
-    const data: MapData[] = _.map(coffeeShops, coffeeShop => ({
-      id: `coffeeshop-${coffeeShop.id.toString()}`,
-      coordinates: {
-        lat: coffeeShop.coordinates.lat,
-        lng: coffeeShop.coordinates.lng,
-      },
-      metadata: coffeeShop,
-      visible: true,
-    }));
-    this.setNewMapData(this.state.mapData, data);
+    try {
+      // TODO: Don't hardcore this API URL in.
+      const coffeeShops = await getRequest<CoffeeShopModel[]>(
+        'http://localhost:8080/coffee_shop',
+      );
+      const data: MapData[] = _.map(coffeeShops, coffeeShop => ({
+        id: `coffeeshop-${coffeeShop.id.toString()}`,
+        geometry: new google.maps.LatLng(coffeeShop.coordinates.lat, coffeeShop.coordinates.lng),
+        metadata: coffeeShop,
+        visible: true,
+      }));
+      this.setNewMapData(this.state.mapData, data);
+    } catch (err) {
+      // TODO: Error state.
+    }
   }
 
   onSelectFilter(selectedFilter: FilterType, mapData: MapData[]) {
@@ -100,22 +97,10 @@ export default class App extends React.Component<{}, State> {
     this.setNewMapData(this.state.mapData, data);
   }
 
-  setWalkingRadius(walkingRadiusOptions: google.maps.CircleOptions) {
-    if (!walkingRadiusOptions) {
-      const mapData = _.map(this.state.mapData, data => {
-        data.visible = true;
-        return data;
-      });
-      this.onSelectFilter(this.state.selectedFilter, mapData);
-    }
-    this.setState({ walkingRadiusOptions });
-  }
-
   render() {
     const {
       map,
       mapData,
-      walkingRadiusOptions,
       selectedFilter,
       selectedCoffeeShop,
     } = this.state;
@@ -125,7 +110,6 @@ export default class App extends React.Component<{}, State> {
           map={map}
           selectedFilter={selectedFilter}
           addMapData={this.addMapData}
-          setWalkingRadius={this.setWalkingRadius}
           onSelectFilter={filter => this.onSelectFilter(filter, mapData)}
         />
         {selectedCoffeeShop ? (
@@ -139,7 +123,6 @@ export default class App extends React.Component<{}, State> {
           {...NY_VIEW}
           mapStyles={MAP_STYLES}
           mapData={mapData}
-          walkingRadiusOptions={walkingRadiusOptions}
           onFeatureClick={this.onFeatureClick}
         />
       </div>

@@ -3,15 +3,16 @@ import * as colors from 'material-ui/styles/colors';
 import * as React from 'react';
 import * as _ from 'underscore';
 
-import { MapData, METERS_PER_HOUR_WALKING_SPEED_MANHATTAN } from '../consts';
+import { MapData } from '../types';
+import {getRequest} from '../fetch';
 
 interface Props {
   // Google Map used for places service.
   map: google.maps.Map;
   // Add feature data to the map.
   addMapData: (data: MapData[]) => void;
-  // Add walking radius to map.
-  setWalkingRadius: (walkingRadiusOptions: google.maps.CircleOptions) => void;
+  // Time in min that the user wants to walk to get coffee.
+  walkingTimeMin: number;
 }
 
 interface State {
@@ -22,9 +23,6 @@ interface State {
   // Currently selected prediction. -1 if there are no predictions.
   selectedPrediction: number;
 }
-
-const findRadius = (timeMin: number) =>
-  (METERS_PER_HOUR_WALKING_SPEED_MANHATTAN * timeMin * 1) / 60;
 
 export default class SearchBar extends React.Component<Props, State> {
   private autocomplete: google.maps.places.AutocompleteService; // Google autocomplete service.
@@ -38,7 +36,6 @@ export default class SearchBar extends React.Component<Props, State> {
       selectedPrediction: -1,
     };
     this.autocomplete = new google.maps.places.AutocompleteService();
-    this.clearSearch = this.clearSearch.bind(this);
   }
 
   componentWillMount() {
@@ -85,38 +82,44 @@ export default class SearchBar extends React.Component<Props, State> {
   }
 
   onSelectPrediction(selection: google.maps.places.AutocompletePrediction) {
-    const { map, addMapData, setWalkingRadius } = this.props;
+    const { map, addMapData, walkingTimeMin } = this.props;
     this.places.getDetails(
       { placeId: selection.place_id },
-      (result, status) => {
-        if (status !== google.maps.places.PlacesServiceStatus.OK) {
-          console.error(`Places failure: ${status}`);
-          return;
-        }
-
-        map.panTo(result.geometry.location);
-        addMapData([
-          {
-            id: 'search',
-            coordinates: {
-              lat: result.geometry.location.lat(),
-              lng: result.geometry.location.lng(),
+      async (result, status) => {
+        try {
+          if (status !== google.maps.places.PlacesServiceStatus.OK) {
+            console.error(`Places failure: ${status}`);
+            return;
+          }
+          const lat = result.geometry.location.lat();
+          const lng = result.geometry.location.lng();
+  
+          const isochrones = await getRequest<number[][]>(
+            `http://localhost:8080/isochrone?origin=${lat},${lng}&walking_time_min=${walkingTimeMin}`,
+          );
+  
+          map.panTo(result.geometry.location);
+          addMapData([
+            {
+              id: 'origin',
+              geometry: new google.maps.LatLng(lat, lng),
+              visible: true,
             },
-            visible: true,
-          },
-        ]);
-        setWalkingRadius({
-          strokeColor: '#607D8B',
-          fillColor: '#B0BEC5',
-          radius: findRadius(5),
-          center: result.geometry.location,
-        });
-
-        this.setState({
-          searchText: selection.description.toLowerCase(),
-          predictions: [],
-          selectedPrediction: -1,
-        });
+            {
+              id: 'isochrones',
+              geometry: new google.maps.Data.Polygon([_.map(isochrones, isochrone => ({lat: isochrone[0], lng: isochrone[1]}))]),
+              visible: true,
+            },
+          ]);
+  
+          this.setState({
+            searchText: selection.description.toLowerCase(),
+            predictions: [],
+            selectedPrediction: -1,
+          });
+        } catch (err) {
+          // TODO: Error state.
+        }
       },
     );
   }
@@ -144,11 +147,6 @@ export default class SearchBar extends React.Component<Props, State> {
     }
   }
 
-  clearSearch() {
-    this.props.setWalkingRadius(null);
-    this.setState({ searchText: '', predictions: [], selectedPrediction: -1 });
-  }
-
   render() {
     const { searchText, predictions, selectedPrediction } = this.state;
     return (
@@ -165,7 +163,7 @@ export default class SearchBar extends React.Component<Props, State> {
             inputStyle={{ paddingLeft: '24px' }}
           />
           {searchText ? (
-            <div className="search-text-delete" onClick={this.clearSearch}>
+            <div className="search-text-delete" onClick={() => this.setState({ searchText: '', predictions: [], selectedPrediction: -1 })}>
               x
             </div>
           ) : null}

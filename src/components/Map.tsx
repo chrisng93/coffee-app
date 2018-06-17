@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as _ from 'underscore';
 
-import { MapData } from '../consts';
+import { MapData } from '../types';
 
 interface Center {
   lat: number;
@@ -14,7 +14,6 @@ interface Props {
   zoom: number;
   // Data to be rendered on the map.
   mapData: MapData[];
-  walkingRadiusOptions?: google.maps.CircleOptions;
   // Custom styles for the basemap.
   mapStyles?: any[];
   onFeatureClick?: (event: google.maps.Data.MouseEvent) => void;
@@ -24,7 +23,6 @@ interface Props {
 
 interface State {
   idToMapData: { [id: string]: MapData };
-  walkingRadius: google.maps.Circle;
 }
 
 export default class Map extends React.Component<Props, State> {
@@ -34,7 +32,6 @@ export default class Map extends React.Component<Props, State> {
     super(props);
     this.state = {
       idToMapData: {},
-      walkingRadius: null,
     };
   }
 
@@ -44,7 +41,6 @@ export default class Map extends React.Component<Props, State> {
       zoom,
       mapStyles,
       mapData,
-      walkingRadiusOptions,
       onFeatureClick,
       setMap,
     } = this.props;
@@ -64,55 +60,21 @@ export default class Map extends React.Component<Props, State> {
     if (onFeatureClick) {
       this.map.data.addListener('click', onFeatureClick);
     }
-    this.reconcileData(mapData, walkingRadiusOptions);
+    this.reconcileData(mapData);
   }
 
   componentWillReceiveProps(nextProps: Props) {
-    if (
-      this.props.mapData !== nextProps.mapData ||
-      this.props.walkingRadiusOptions !== nextProps.walkingRadiusOptions
-    ) {
-      this.reconcileData(nextProps.mapData, nextProps.walkingRadiusOptions);
+    if (this.props.mapData !== nextProps.mapData) {
+      this.reconcileData(nextProps.mapData);
     }
   }
 
-  reconcileData(
-    newData: MapData[],
-    walkingRadiusOptions: google.maps.CircleOptions,
-  ) {
-    const { idToMapData, walkingRadius } = this.state;
+  reconcileData(newData: MapData[]) {
+    const { idToMapData } = this.state;
     const oldIDToMapData = { ...idToMapData };
     const newIDToMapData: { [id: string]: MapData } = {};
 
-    // Set visibility based on walking radius.
-    let newWalkingRadius = walkingRadius;
-    if (walkingRadiusOptions) {
-      if (walkingRadius) {
-        walkingRadius.setMap(null);
-      }
-      newWalkingRadius = new google.maps.Circle({
-        map: this.map,
-        ...walkingRadiusOptions,
-      });
-      this.map.fitBounds(newWalkingRadius.getBounds());
-    } else {
-      if (walkingRadius) {
-        walkingRadius.setMap(null);
-        newWalkingRadius = null;
-      }
-    }
-
-    const walkingRadiusBounds =
-      newWalkingRadius && newWalkingRadius.getBounds();
     _.each(newData, data => {
-      // We need to set visibility for each feature in the map component since we need to get the
-      // bounds of the walking radius in order to determine visibility.
-      if (
-        walkingRadiusBounds &&
-        !walkingRadiusBounds.contains(data.coordinates)
-      ) {
-        data.visible = false;
-      }
       // Need to create a copy of the data, otherwise the data in the mapping gets mutated
       // immediately when new props are sent in. (Objects in JS are passed by reference)
       newIDToMapData[data.id] = { ...data };
@@ -129,8 +91,8 @@ export default class Map extends React.Component<Props, State> {
           // Add data if it should be visible.
           this.addData(data);
         }
-        if (oldData.coordinates !== data.coordinates) {
-          // Re-render data if coordinates changed.
+        if (oldData.geometry !== data.geometry) {
+          // Re-render data if geometry has changed.
           this.removeData(data);
           this.addData(data);
         }
@@ -147,13 +109,15 @@ export default class Map extends React.Component<Props, State> {
       data.seen = false;
     });
 
-    // If there's a walking radius, filter out (set visibility) coffee shops that are outside of
-    // the radius.
+    // Set map's center at the origin if present.
+    const origin = this.map.data.getFeatureById('origin');
+    if (origin) {
+      let originLatLng: google.maps.LatLng;
+      origin.getGeometry().forEachLatLng(latLng => originLatLng = latLng);
+      this.map.setCenter(originLatLng);
+    }
 
-    this.setState({
-      idToMapData: newIDToMapData,
-      walkingRadius: newWalkingRadius,
-    });
+    this.setState({idToMapData: newIDToMapData});
   }
 
   addData(data: MapData) {
@@ -163,40 +127,23 @@ export default class Map extends React.Component<Props, State> {
 
     const feature = new google.maps.Data.Feature({
       id: data.id,
-      geometry: new google.maps.LatLng(
-        data.coordinates.lat,
-        data.coordinates.lng,
-      ),
+      geometry: data.geometry,
       properties: { metadata: data.metadata },
     });
     this.map.data.add(feature);
+
+    // Special case for isochrones - fit the map to these bounds.
+    if (data.id === 'isochrones') {
+      const bounds = new google.maps.LatLngBounds();
+      (data.geometry as google.maps.Data.Geometry).forEachLatLng(latLng => bounds.extend(latLng));
+      this.map.fitBounds(bounds);
+    }
   }
 
   removeData(data: MapData) {
     const feature = this.map.data.getFeatureById(data.id);
     if (feature) {
       this.map.data.remove(feature);
-    }
-  }
-
-  filterForWalkingRadius(
-    oldData: { [id: string]: MapData },
-    newData: { [id: string]: MapData },
-  ) {
-    const { walkingRadius } = this.state;
-    if (walkingRadius) {
-      _.each(newData, (data, id) => {
-        const {
-          coordinates: { lat, lng },
-        } = data;
-        if (
-          !walkingRadius.getBounds().contains(new google.maps.LatLng(lat, lng))
-        ) {
-          console.log('not visible');
-          newData[id].visible = false;
-        }
-      });
-      this.setState({ idToMapData: newData });
     }
   }
 
