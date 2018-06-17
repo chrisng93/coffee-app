@@ -1,13 +1,18 @@
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import MediaQuery from 'react-responsive';
 
 import App from './components/App';
 import registerServiceWorker from './registerServiceWorker';
 
+const SMALL_SCREEN_WIDTH = 991;
+
 ReactDOM.render(
   <MuiThemeProvider>
-    <App />
+    <MediaQuery maxDeviceWidth={SMALL_SCREEN_WIDTH}>
+      {matches => <App isSmallScreen={matches} />}
+    </MediaQuery>
   </MuiThemeProvider>,
   document.getElementById('root'),
 );

@@ -7,6 +7,7 @@ import { MapData } from '../types';
 import {getRequest} from '../fetch';
 
 interface Props {
+  isSmallScreen: boolean;
   // Google Map used for places service.
   map: google.maps.Map;
   // Data to render on map.
@@ -17,6 +18,8 @@ interface Props {
   updateDataFilter: (data: MapData) => MapData;
   // Time in min that the user wants to walk to get coffee.
   walkingTimeMin: number;
+  // Update autocomplete open state in AppBar.
+  setAutocompleteOpen: (open: boolean) => void;
 }
 
 interface State {
@@ -55,6 +58,12 @@ export default class SearchBar extends React.Component<Props, State> {
     }
   }
 
+  componentWillUpdate(nextProps: Props, nextState: State) {
+    if (this.state.predictions.length !== nextState.predictions.length) {
+      this.props.setAutocompleteOpen(nextState.predictions.length !== 0);
+    }
+  }
+
   componentWillUnmount() {
     document.removeEventListener('keydown', event =>
       this.handleKeyDown(event.keyCode),
@@ -89,7 +98,7 @@ export default class SearchBar extends React.Component<Props, State> {
 
 
   onSelectPrediction(selection: google.maps.places.AutocompletePrediction) {
-    const { map, mapData, updateMapData, walkingTimeMin } = this.props;
+    const { map, mapData, updateMapData, walkingTimeMin, setAutocompleteOpen } = this.props;
     this.places.getDetails(
       { placeId: selection.place_id },
       async (result, status) => {
@@ -181,6 +190,7 @@ export default class SearchBar extends React.Component<Props, State> {
   }
 
   render() {
+    const {isSmallScreen} = this.props;
     const { searchText, predictions, selectedPrediction } = this.state;
     return (
       <div className="search-bar">
@@ -191,9 +201,9 @@ export default class SearchBar extends React.Component<Props, State> {
             onChange={(event, val) => this.onInputChange(val)}
             underlineShow={false}
             fullWidth={true}
-            style={{ height: '100%', lineHeight: '16px' }}
-            hintStyle={{ paddingLeft: '24px' }}
-            inputStyle={{ paddingLeft: '24px' }}
+            style={{ height: '100%', width: '90%', lineHeight: '16px', overflow: 'hidden' }}
+            hintStyle={{ paddingLeft: isSmallScreen ? '12px' : '24px' }}
+            inputStyle={{ paddingLeft: isSmallScreen ? '12px' : '24px' }}
           />
           {searchText ? (
             <div className="search-text-delete" onClick={this.clearSearch}>

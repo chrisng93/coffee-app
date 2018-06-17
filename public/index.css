@@ -43,10 +43,11 @@ body {
   height: 100%;
   width: 100%;
   display: flex;
+  overflow: hidden;
 }
 
 .search-text-delete {
-  margin-left: -20px;
+  margin-left: 8px;
   display: flex;
   align-items: center;
   z-index: 1;
@@ -70,6 +71,10 @@ body {
 
 /* Medium and down */
 @media only screen and (max-width: 991px) {
+  .app-bar h1 {
+    font-size: 18px;
+  }
+
   .filters {
     padding: 8px;
   }

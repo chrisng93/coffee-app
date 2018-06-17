@@ -10,6 +10,7 @@ import SearchBar from './SearchBar';
 const TITLE = 'Coffee Around Me';
 
 interface Props {
+  isSmallScreen: boolean;
   // Map for passing down to SearchBar.
   map: google.maps.Map;
   // Data to render on map.
@@ -25,20 +26,23 @@ interface Props {
 interface State {
   // Whether or not filters are open.
   filtersOpen: boolean;
+  // Whether or not autocomplete is open.
+  autocompleteOpen: boolean;
   // Time in min that the user wants to walk to get coffee.
   walkingTimeMin: number;
 }
 
-export default class Filter extends React.Component<Props, State> {
+export default class AppBar extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
       filtersOpen: false,
+      autocompleteOpen: false,
       walkingTimeMin: 10,
     };
     this.updateDataFromFilterFn = this.updateDataFromFilterFn.bind(this);
   }
-  
+
   updateDataFromFilterFn(data: MapData, selectedFilter: FilterType) {
     if (!selectedFilter) {
       data.visible = true;
@@ -55,21 +59,26 @@ export default class Filter extends React.Component<Props, State> {
   }
 
   render() {
-    const { map, mapData, updateMapData, selectedFilter } = this.props;
-    const { filtersOpen, walkingTimeMin } = this.state;
+    const { isSmallScreen, map, mapData, updateMapData, selectedFilter } = this.props;
+    const { filtersOpen, autocompleteOpen, walkingTimeMin } = this.state;
+    console.log(autocompleteOpen)
     return (
       <div>
         <Toolbar className="app-bar">
-          <ToolbarGroup firstChild={true}>
-            <h1>{TITLE}</h1>
-          </ToolbarGroup>
-          <ToolbarGroup style={{ width: '50%' }}>
+        {!autocompleteOpen && isSmallScreen
+          ? <ToolbarGroup firstChild={true}>
+              <h1>{TITLE}</h1>
+            </ToolbarGroup>
+          : null}
+          <ToolbarGroup style={{ width: isSmallScreen ? '90%' : '50%' }}>
             <SearchBar
+              isSmallScreen={isSmallScreen}
               map={map}
               mapData={mapData}
               updateMapData={updateMapData}
               walkingTimeMin={walkingTimeMin}
               updateDataFilter={(data: MapData) => this.updateDataFromFilterFn(data, selectedFilter)}
+              setAutocompleteOpen={(autocompleteOpen: boolean) => this.setState({autocompleteOpen})}
             />
           </ToolbarGroup>
           <ToolbarGroup lastChild={true}>

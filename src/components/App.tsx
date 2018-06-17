@@ -13,6 +13,10 @@ const NY_VIEW = {
   zoom: 14,
 };
 
+interface Props {
+  isSmallScreen: boolean;
+}
+
 interface State {
   // Map for passing down to SearchBar.
   map: google.maps.Map;
@@ -24,8 +28,8 @@ interface State {
   selectedCoffeeShop: CoffeeShopModel;
 }
 
-export default class App extends React.Component<{}, State> {
-  constructor(props: {}) {
+export default class App extends React.Component<Props, State> {
+  constructor(props: Props) {
     super(props);
     this.state = {
       map: null,
@@ -85,6 +89,7 @@ export default class App extends React.Component<{}, State> {
     return (
       <div>
         <AppBar
+          isSmallScreen={this.props.isSmallScreen}
           map={map}
           mapData={mapData}
           selectedFilter={selectedFilter}

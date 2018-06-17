@@ -1,4 +1,5 @@
 import { Checkbox, Slider } from 'material-ui';
+import * as colors from 'material-ui/styles/colors';
 import * as React from 'react';
 import * as _ from 'underscore';
 
@@ -47,6 +48,8 @@ const selectFilter = (
   onSelectFilter(filter);
 };
 
+// Filters define the options for the end user to filter out coffee shops. Currently not in use.
+// Most of the functionality for the filters isn't implemented on the backend yet.
 const Filters = ({ selectedFilter, updateMapData, onSelectFilter, updateDataFromFilterFn, setWalkingTime }: Props) => (
   <div className="filters">
     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -57,6 +60,8 @@ const Filters = ({ selectedFilter, updateMapData, onSelectFilter, updateDataFrom
             min={1}
             max={30}
             step={1}
+            style={{color: colors.blueGrey500}}
+            sliderStyle={{color: colors.blueGrey500}}
             onChange={(event, val) => _.debounce(() => setWalkingTime(val), 100)()}
           />
         </div>
