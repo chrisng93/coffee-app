@@ -11,6 +11,8 @@ interface Props {
   map: google.maps.Map;
   // Add feature data to the map.
   addMapData: (data: MapData[]) => void;
+  // Update map data based on update function.
+  updateMapData: (updateFn: (data: MapData) => MapData) => void;
   // Time in min that the user wants to walk to get coffee.
   walkingTimeMin: number;
 }
@@ -36,6 +38,7 @@ export default class SearchBar extends React.Component<Props, State> {
       selectedPrediction: -1,
     };
     this.autocomplete = new google.maps.places.AutocompleteService();
+    this.clearSearch = this.clearSearch.bind(this);
   }
 
   componentWillMount() {
@@ -147,6 +150,16 @@ export default class SearchBar extends React.Component<Props, State> {
     }
   }
 
+  clearSearch() {
+    this.props.updateMapData((data: MapData) => {
+      if (data.id === 'origin' || data.id === 'isochrones') {
+        data.visible = false;
+      }
+      return data;
+    });
+    this.setState({ searchText: '', predictions: [], selectedPrediction: -1 });
+  }
+
   render() {
     const { searchText, predictions, selectedPrediction } = this.state;
     return (
@@ -163,7 +176,7 @@ export default class SearchBar extends React.Component<Props, State> {
             inputStyle={{ paddingLeft: '24px' }}
           />
           {searchText ? (
-            <div className="search-text-delete" onClick={() => this.setState({ searchText: '', predictions: [], selectedPrediction: -1 })}>
+            <div className="search-text-delete" onClick={this.clearSearch}>
               x
             </div>
           ) : null}

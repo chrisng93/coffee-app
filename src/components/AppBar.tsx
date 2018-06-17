@@ -16,7 +16,9 @@ interface Props {
   selectedFilter: FilterType;
   // Add feature data to the map.
   addMapData: (data: MapData[]) => void;
-  // Callback for when filter is selected.
+  // Update map data based on update function.
+  updateMapData: (updateFn: (data: MapData) => MapData) => void;
+  // Select a filter.
   onSelectFilter: (filter: FilterType) => void;
 }
 
@@ -37,7 +39,7 @@ export default class Filter extends React.Component<Props, State> {
   }
 
   render() {
-    const { map, addMapData } = this.props;
+    const { map, addMapData, updateMapData } = this.props;
     const { filtersOpen, walkingTimeMin } = this.state;
     return (
       <div>
@@ -49,6 +51,7 @@ export default class Filter extends React.Component<Props, State> {
             <SearchBar
               map={map}
               addMapData={addMapData}
+              updateMapData={updateMapData}
               walkingTimeMin={walkingTimeMin}
             />
           </ToolbarGroup>

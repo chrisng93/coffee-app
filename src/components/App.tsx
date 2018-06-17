@@ -36,6 +36,7 @@ export default class App extends React.Component<{}, State> {
     this.setMap = this.setMap.bind(this);
     this.onFeatureClick = this.onFeatureClick.bind(this);
     this.addMapData = this.addMapData.bind(this);
+    this.updateMapData = this.updateMapData.bind(this);
   }
 
   componentDidMount() {
@@ -64,24 +65,6 @@ export default class App extends React.Component<{}, State> {
     }
   }
 
-  onSelectFilter(selectedFilter: FilterType, mapData: MapData[]) {
-    const newMapData: MapData[] = _.map(mapData, data => {
-      if (!selectedFilter) {
-        data.visible = true;
-      } else if (selectedFilter === 'coffee') {
-        // NOTE: has_good_coffee is not implemented yet.
-        data.visible = data.metadata.has_good_coffee;
-      } else if (selectedFilter === 'study') {
-        data.visible = data.metadata.is_good_for_studying;
-      } else {
-        // NOTE: is_instagrammable is not implemented yet.
-        data.visible = data.metadata.is_instagrammable;
-      }
-      return data;
-    });
-    this.setState({ selectedFilter, mapData: newMapData });
-  }
-
   setMap(newMap: google.maps.Map) {
     this.setState({ map: newMap });
   }
@@ -97,6 +80,10 @@ export default class App extends React.Component<{}, State> {
     this.setNewMapData(this.state.mapData, data);
   }
 
+  updateMapData(mapData: MapData[], updateFn: (data: MapData) => MapData) {
+    this.setState({mapData: _.map(mapData, updateFn)});
+  }
+
   render() {
     const {
       map,
@@ -110,7 +97,8 @@ export default class App extends React.Component<{}, State> {
           map={map}
           selectedFilter={selectedFilter}
           addMapData={this.addMapData}
-          onSelectFilter={filter => this.onSelectFilter(filter, mapData)}
+          updateMapData={updateFn => this.updateMapData(mapData, updateFn)}
+          onSelectFilter={(filter: FilterType) => this.setState({selectedFilter: filter})}
         />
         {selectedCoffeeShop ? (
           <CoffeeShop

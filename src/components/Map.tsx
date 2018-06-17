@@ -111,7 +111,7 @@ export default class Map extends React.Component<Props, State> {
 
     // Set map's center at the origin if present.
     const origin = this.map.data.getFeatureById('origin');
-    if (origin) {
+    if (origin && newIDToMapData.origin && newIDToMapData.origin.visible) {
       let originLatLng: google.maps.LatLng;
       origin.getGeometry().forEachLatLng(latLng => originLatLng = latLng);
       this.map.setCenter(originLatLng);
