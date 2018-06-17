@@ -35,16 +35,11 @@ export default class App extends React.Component<{}, State> {
     };
     this.setMap = this.setMap.bind(this);
     this.onFeatureClick = this.onFeatureClick.bind(this);
-    this.addMapData = this.addMapData.bind(this);
     this.updateMapData = this.updateMapData.bind(this);
   }
 
   componentDidMount() {
     this.getAndSetCoffeeShops();
-  }
-
-  setNewMapData(currentMapData: MapData[], additionalMapData: MapData[]) {
-    this.setState({ mapData: currentMapData.concat(additionalMapData) });
   }
 
   async getAndSetCoffeeShops() {
@@ -59,7 +54,7 @@ export default class App extends React.Component<{}, State> {
         metadata: coffeeShop,
         visible: true,
       }));
-      this.setNewMapData(this.state.mapData, data);
+      this.setState({ mapData: this.state.mapData.concat(data) });
     } catch (err) {
       // TODO: Error state.
     }
@@ -74,10 +69,6 @@ export default class App extends React.Component<{}, State> {
     this.setState({
       selectedCoffeeShop: event.feature.getProperty('metadata'),
     });
-  }
-
-  addMapData(data: MapData[]) {
-    this.setNewMapData(this.state.mapData, data);
   }
 
   updateMapData(mapData: MapData[], updateFn: (data: MapData) => MapData) {
@@ -95,9 +86,9 @@ export default class App extends React.Component<{}, State> {
       <div>
         <AppBar
           map={map}
+          mapData={mapData}
           selectedFilter={selectedFilter}
-          addMapData={this.addMapData}
-          updateMapData={updateFn => this.updateMapData(mapData, updateFn)}
+          updateMapData={this.updateMapData}
           onSelectFilter={(filter: FilterType) => this.setState({selectedFilter: filter})}
         />
         {selectedCoffeeShop ? (

@@ -13,6 +13,8 @@ interface Props {
   setWalkingTime: (walkingTimeMin: number) => void;
   // Select a filter.
   onSelectFilter: (filter: FilterType) => void;
+  // Update map data based on selected filter.
+  updateDataFromFilterFn: (data: MapData, selectedFilter: FilterType) => MapData;
 }
 
 // Render all options for coffee filters. Shown when coffee filter is selected.
@@ -35,31 +37,17 @@ const renderCoffeeFilters = () => (
   </div>
 );
 
-const updateData = (data: MapData, selectedFilter: FilterType) => {
-  if (!selectedFilter) {
-    data.visible = true;
-  } else if (selectedFilter === 'coffee') {
-    // NOTE: has_good_coffee is not implemented yet.
-    data.visible = data.metadata.has_good_coffee;
-  } else if (selectedFilter === 'study') {
-    data.visible = data.metadata.is_good_for_studying;
-  } else {
-    // NOTE: is_instagrammable is not implemented yet.
-    data.visible = data.metadata.is_instagrammable;
-  }
-  return data;
-};
-
 const selectFilter = (
   updateMapData: (updateFn: (data: MapData) => MapData) => void,
   onSelectFilter: (filter: FilterType) => void,
+  updateDataFromFilterFn: (data: MapData, selectedFilter: FilterType) => MapData,
   filter: FilterType,
 ) => {
-  updateMapData((data: MapData) => updateData(data, filter));
+  updateMapData((data: MapData) => updateDataFromFilterFn(data, filter));
   onSelectFilter(filter);
 };
 
-const Filters = ({ selectedFilter, updateMapData, onSelectFilter, setWalkingTime }: Props) => (
+const Filters = ({ selectedFilter, updateMapData, onSelectFilter, updateDataFromFilterFn, setWalkingTime }: Props) => (
   <div className="filters">
     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
       <div style={{ flex: 1 }}>
@@ -78,21 +66,21 @@ const Filters = ({ selectedFilter, updateMapData, onSelectFilter, setWalkingTime
             label="Good coffee"
             checked={selectedFilter === 'coffee'}
             onCheck={(e, isInputChecked) =>
-              selectFilter(updateMapData, onSelectFilter, isInputChecked ? 'coffee' : null)
+              selectFilter(updateMapData, onSelectFilter, updateDataFromFilterFn, isInputChecked ? 'coffee' : null)
             }
           />
           <Checkbox
             label="To study"
             checked={selectedFilter === 'study'}
             onCheck={(e, isInputChecked) =>
-              selectFilter(updateMapData, onSelectFilter, isInputChecked ? 'study' : null)
+              selectFilter(updateMapData, onSelectFilter, updateDataFromFilterFn, isInputChecked ? 'study' : null)
             }
           />
           <Checkbox
             label="To do it for the gram"
             checked={selectedFilter === 'gram'}
             onCheck={(e, isInputChecked) =>
-              selectFilter(updateMapData, onSelectFilter, isInputChecked ? 'gram' : null)
+              selectFilter(updateMapData, onSelectFilter, updateDataFromFilterFn, isInputChecked ? 'gram' : null)
             }
           />
         </div>

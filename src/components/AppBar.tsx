@@ -12,12 +12,12 @@ const TITLE = 'Coffee Around Me';
 interface Props {
   // Map for passing down to SearchBar.
   map: google.maps.Map;
+  // Data to render on map.
+  mapData: MapData[];
   // Currently selected filter. Null if none.
   selectedFilter: FilterType;
-  // Add feature data to the map.
-  addMapData: (data: MapData[]) => void;
-  // Update map data based on update function.
-  updateMapData: (updateFn: (data: MapData) => MapData) => void;
+  // Update map data based on input map data and update function.
+  updateMapData: (mapData: MapData[], updateFn: (data: MapData) => MapData) => void;
   // Select a filter.
   onSelectFilter: (filter: FilterType) => void;
 }
@@ -36,10 +36,26 @@ export default class Filter extends React.Component<Props, State> {
       filtersOpen: false,
       walkingTimeMin: 10,
     };
+    this.updateDataFromFilterFn = this.updateDataFromFilterFn.bind(this);
+  }
+  
+  updateDataFromFilterFn(data: MapData, selectedFilter: FilterType) {
+    if (!selectedFilter) {
+      data.visible = true;
+    } else if (selectedFilter === 'coffee') {
+      // NOTE: has_good_coffee is not implemented yet.
+      data.visible = data.metadata.has_good_coffee;
+    } else if (selectedFilter === 'study') {
+      data.visible = data.metadata.is_good_for_studying;
+    } else {
+      // NOTE: is_instagrammable is not implemented yet.
+      data.visible = data.metadata.is_instagrammable;
+    }
+    return data;
   }
 
   render() {
-    const { map, addMapData, updateMapData } = this.props;
+    const { map, mapData, updateMapData, selectedFilter } = this.props;
     const { filtersOpen, walkingTimeMin } = this.state;
     return (
       <div>
@@ -50,9 +66,10 @@ export default class Filter extends React.Component<Props, State> {
           <ToolbarGroup style={{ width: '50%' }}>
             <SearchBar
               map={map}
-              addMapData={addMapData}
+              mapData={mapData}
               updateMapData={updateMapData}
               walkingTimeMin={walkingTimeMin}
+              updateDataFilter={(data: MapData) => this.updateDataFromFilterFn(data, selectedFilter)}
             />
           </ToolbarGroup>
           <ToolbarGroup lastChild={true}>
@@ -64,6 +81,8 @@ export default class Filter extends React.Component<Props, State> {
         {filtersOpen
             ? <Filters
                 {...this.props}
+                updateMapData={(updateFn: (data: MapData) => MapData) => updateMapData(mapData, updateFn)}
+                updateDataFromFilterFn={this.updateDataFromFilterFn}
                 setWalkingTime={(newWalkingTimeMin: number) => this.setState({walkingTimeMin: newWalkingTimeMin})}
               />
             : null}
