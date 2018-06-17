@@ -4,7 +4,7 @@ import * as React from 'react';
 import * as _ from 'underscore';
 
 import { MapData } from '../types';
-import {getRequest} from '../fetch';
+import { getRequest } from '../fetch';
 
 interface Props {
   isSmallScreen: boolean;
@@ -13,7 +13,10 @@ interface Props {
   // Data to render on map.
   mapData: MapData[];
   // Update map data based on input map data and update function.
-  updateMapData: (mapData: MapData[], updateFn: (data: MapData) => MapData) => void;
+  updateMapData: (
+    mapData: MapData[],
+    updateFn: (data: MapData) => MapData,
+  ) => void;
   // Filter map data based on selected filter.
   updateDataFilter: (data: MapData) => MapData;
   // Time in min that the user wants to walk to get coffee.
@@ -95,10 +98,14 @@ export default class SearchBar extends React.Component<Props, State> {
     });
   }
 
-
-
   onSelectPrediction(selection: google.maps.places.AutocompletePrediction) {
-    const { map, mapData, updateMapData, walkingTimeMin, setAutocompleteOpen } = this.props;
+    const {
+      map,
+      mapData,
+      updateMapData,
+      walkingTimeMin,
+      setAutocompleteOpen,
+    } = this.props;
     this.places.getDetails(
       { placeId: selection.place_id },
       async (result, status) => {
@@ -109,12 +116,15 @@ export default class SearchBar extends React.Component<Props, State> {
           }
           const lat = result.geometry.location.lat();
           const lng = result.geometry.location.lng();
-  
+
           const isochrones = await getRequest<number[][]>(
             `http://localhost:8080/isochrone?origin=${lat},${lng}&walking_time_min=${walkingTimeMin}`,
           );
-          const isochroneLatLngs = _.map(isochrones, isochrone => ({lat: isochrone[0], lng: isochrone[1]}));
-  
+          const isochroneLatLngs = _.map(isochrones, isochrone => ({
+            lat: isochrone[0],
+            lng: isochrone[1],
+          }));
+
           map.panTo(result.geometry.location);
 
           // Add origin/isochrones and hide coffee shops that aren't within the specified
@@ -133,14 +143,20 @@ export default class SearchBar extends React.Component<Props, State> {
           ];
 
           // We need to create this polygon to use the google.maps.geometry.poly.containsLocation method.
-          const polygon = new google.maps.Polygon({paths: isochroneLatLngs});
+          const polygon = new google.maps.Polygon({ paths: isochroneLatLngs });
           updateMapData(mapData.concat(newData), (data: MapData) => {
-            if (data.geometry instanceof google.maps.LatLng && !google.maps.geometry.poly.containsLocation(data.geometry, polygon)) {
+            if (
+              data.geometry instanceof google.maps.LatLng &&
+              !google.maps.geometry.poly.containsLocation(
+                data.geometry,
+                polygon,
+              )
+            ) {
               data.visible = false;
             }
             return data;
           });
-  
+
           this.setState({
             searchText: selection.description.toLowerCase(),
             predictions: [],
@@ -177,12 +193,12 @@ export default class SearchBar extends React.Component<Props, State> {
   }
 
   clearSearch() {
-    const {mapData, updateMapData, updateDataFilter} = this.props;
+    const { mapData, updateMapData, updateDataFilter } = this.props;
     updateMapData(mapData, (data: MapData) => {
       if (data.id === 'origin' || data.id === 'isochrones') {
         data.visible = false;
       } else {
-        data = updateDataFilter(data)
+        data = updateDataFilter(data);
       }
       return data;
     });
@@ -190,7 +206,7 @@ export default class SearchBar extends React.Component<Props, State> {
   }
 
   render() {
-    const {isSmallScreen} = this.props;
+    const { isSmallScreen } = this.props;
     const { searchText, predictions, selectedPrediction } = this.state;
     return (
       <div className="search-bar">
@@ -201,7 +217,12 @@ export default class SearchBar extends React.Component<Props, State> {
             onChange={(event, val) => this.onInputChange(val)}
             underlineShow={false}
             fullWidth={true}
-            style={{ height: '100%', width: '90%', lineHeight: '16px', overflow: 'hidden' }}
+            style={{
+              height: '100%',
+              width: '90%',
+              lineHeight: '16px',
+              overflow: 'hidden',
+            }}
             hintStyle={{ paddingLeft: isSmallScreen ? '12px' : '24px' }}
             inputStyle={{ paddingLeft: isSmallScreen ? '12px' : '24px' }}
           />

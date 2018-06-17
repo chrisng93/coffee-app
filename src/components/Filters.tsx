@@ -15,7 +15,10 @@ interface Props {
   // Select a filter.
   onSelectFilter: (filter: FilterType) => void;
   // Update map data based on selected filter.
-  updateDataFromFilterFn: (data: MapData, selectedFilter: FilterType) => MapData;
+  updateDataFromFilterFn: (
+    data: MapData,
+    selectedFilter: FilterType,
+  ) => MapData;
 }
 
 // Render all options for coffee filters. Shown when coffee filter is selected.
@@ -41,7 +44,10 @@ const renderCoffeeFilters = () => (
 const selectFilter = (
   updateMapData: (updateFn: (data: MapData) => MapData) => void,
   onSelectFilter: (filter: FilterType) => void,
-  updateDataFromFilterFn: (data: MapData, selectedFilter: FilterType) => MapData,
+  updateDataFromFilterFn: (
+    data: MapData,
+    selectedFilter: FilterType,
+  ) => MapData,
   filter: FilterType,
 ) => {
   updateMapData((data: MapData) => updateDataFromFilterFn(data, filter));
@@ -50,19 +56,28 @@ const selectFilter = (
 
 // Filters define the options for the end user to filter out coffee shops. Currently not in use.
 // Most of the functionality for the filters isn't implemented on the backend yet.
-const Filters = ({ selectedFilter, updateMapData, onSelectFilter, updateDataFromFilterFn, setWalkingTime }: Props) => (
+const Filters = ({
+  selectedFilter,
+  updateMapData,
+  onSelectFilter,
+  updateDataFromFilterFn,
+  setWalkingTime,
+}: Props) => (
   <div className="filters">
     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
       <div style={{ flex: 1 }}>
-        <div>Walking time
+        <div>
+          Walking time
           <Slider
             defaultValue={5}
             min={1}
             max={30}
             step={1}
-            style={{color: colors.blueGrey500}}
-            sliderStyle={{color: colors.blueGrey500}}
-            onChange={(event, val) => _.debounce(() => setWalkingTime(val), 100)()}
+            style={{ color: colors.blueGrey500 }}
+            sliderStyle={{ color: colors.blueGrey500 }}
+            onChange={(event, val) =>
+              _.debounce(() => setWalkingTime(val), 100)()
+            }
           />
         </div>
         <h2>I want...</h2>
@@ -71,21 +86,36 @@ const Filters = ({ selectedFilter, updateMapData, onSelectFilter, updateDataFrom
             label="Good coffee"
             checked={selectedFilter === 'coffee'}
             onCheck={(e, isInputChecked) =>
-              selectFilter(updateMapData, onSelectFilter, updateDataFromFilterFn, isInputChecked ? 'coffee' : null)
+              selectFilter(
+                updateMapData,
+                onSelectFilter,
+                updateDataFromFilterFn,
+                isInputChecked ? 'coffee' : null,
+              )
             }
           />
           <Checkbox
             label="To study"
             checked={selectedFilter === 'study'}
             onCheck={(e, isInputChecked) =>
-              selectFilter(updateMapData, onSelectFilter, updateDataFromFilterFn, isInputChecked ? 'study' : null)
+              selectFilter(
+                updateMapData,
+                onSelectFilter,
+                updateDataFromFilterFn,
+                isInputChecked ? 'study' : null,
+              )
             }
           />
           <Checkbox
             label="To do it for the gram"
             checked={selectedFilter === 'gram'}
             onCheck={(e, isInputChecked) =>
-              selectFilter(updateMapData, onSelectFilter, updateDataFromFilterFn, isInputChecked ? 'gram' : null)
+              selectFilter(
+                updateMapData,
+                onSelectFilter,
+                updateDataFromFilterFn,
+                isInputChecked ? 'gram' : null,
+              )
             }
           />
         </div>

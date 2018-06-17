@@ -113,11 +113,11 @@ export default class Map extends React.Component<Props, State> {
     const origin = this.map.data.getFeatureById('origin');
     if (origin && newIDToMapData.origin && newIDToMapData.origin.visible) {
       let originLatLng: google.maps.LatLng;
-      origin.getGeometry().forEachLatLng(latLng => originLatLng = latLng);
+      origin.getGeometry().forEachLatLng(latLng => (originLatLng = latLng));
       this.map.setCenter(originLatLng);
     }
 
-    this.setState({idToMapData: newIDToMapData});
+    this.setState({ idToMapData: newIDToMapData });
   }
 
   addData(data: MapData) {
@@ -135,7 +135,9 @@ export default class Map extends React.Component<Props, State> {
     // Special case for isochrones - fit the map to these bounds.
     if (data.id === 'isochrones') {
       const bounds = new google.maps.LatLngBounds();
-      (data.geometry as google.maps.Data.Geometry).forEachLatLng(latLng => bounds.extend(latLng));
+      (data.geometry as google.maps.Data.Geometry).forEachLatLng(latLng =>
+        bounds.extend(latLng),
+      );
       this.map.fitBounds(bounds);
     }
   }

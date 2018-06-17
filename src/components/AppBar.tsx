@@ -18,7 +18,10 @@ interface Props {
   // Currently selected filter. Null if none.
   selectedFilter: FilterType;
   // Update map data based on input map data and update function.
-  updateMapData: (mapData: MapData[], updateFn: (data: MapData) => MapData) => void;
+  updateMapData: (
+    mapData: MapData[],
+    updateFn: (data: MapData) => MapData,
+  ) => void;
   // Select a filter.
   onSelectFilter: (filter: FilterType) => void;
 }
@@ -59,17 +62,23 @@ export default class AppBar extends React.Component<Props, State> {
   }
 
   render() {
-    const { isSmallScreen, map, mapData, updateMapData, selectedFilter } = this.props;
+    const {
+      isSmallScreen,
+      map,
+      mapData,
+      updateMapData,
+      selectedFilter,
+    } = this.props;
     const { filtersOpen, autocompleteOpen, walkingTimeMin } = this.state;
-    console.log(autocompleteOpen)
+    console.log(autocompleteOpen);
     return (
       <div>
         <Toolbar className="app-bar">
-        {!autocompleteOpen && isSmallScreen
-          ? <ToolbarGroup firstChild={true}>
+          {!autocompleteOpen && isSmallScreen ? (
+            <ToolbarGroup firstChild={true}>
               <h1>{TITLE}</h1>
             </ToolbarGroup>
-          : null}
+          ) : null}
           <ToolbarGroup style={{ width: isSmallScreen ? '90%' : '50%' }}>
             <SearchBar
               isSmallScreen={isSmallScreen}
@@ -77,8 +86,12 @@ export default class AppBar extends React.Component<Props, State> {
               mapData={mapData}
               updateMapData={updateMapData}
               walkingTimeMin={walkingTimeMin}
-              updateDataFilter={(data: MapData) => this.updateDataFromFilterFn(data, selectedFilter)}
-              setAutocompleteOpen={(autocompleteOpen: boolean) => this.setState({autocompleteOpen})}
+              updateDataFilter={(data: MapData) =>
+                this.updateDataFromFilterFn(data, selectedFilter)
+              }
+              setAutocompleteOpen={(autocompleteOpen: boolean) =>
+                this.setState({ autocompleteOpen })
+              }
             />
           </ToolbarGroup>
           <ToolbarGroup lastChild={true}>
@@ -87,14 +100,18 @@ export default class AppBar extends React.Component<Props, State> {
             </div>
           </ToolbarGroup>
         </Toolbar>
-        {filtersOpen
-            ? <Filters
-                {...this.props}
-                updateMapData={(updateFn: (data: MapData) => MapData) => updateMapData(mapData, updateFn)}
-                updateDataFromFilterFn={this.updateDataFromFilterFn}
-                setWalkingTime={(newWalkingTimeMin: number) => this.setState({walkingTimeMin: newWalkingTimeMin})}
-              />
-            : null}
+        {filtersOpen ? (
+          <Filters
+            {...this.props}
+            updateMapData={(updateFn: (data: MapData) => MapData) =>
+              updateMapData(mapData, updateFn)
+            }
+            updateDataFromFilterFn={this.updateDataFromFilterFn}
+            setWalkingTime={(newWalkingTimeMin: number) =>
+              this.setState({ walkingTimeMin: newWalkingTimeMin })
+            }
+          />
+        ) : null}
       </div>
     );
   }

@@ -54,7 +54,10 @@ export default class App extends React.Component<Props, State> {
       );
       const data: MapData[] = _.map(coffeeShops, coffeeShop => ({
         id: `coffeeshop-${coffeeShop.id.toString()}`,
-        geometry: new google.maps.LatLng(coffeeShop.coordinates.lat, coffeeShop.coordinates.lng),
+        geometry: new google.maps.LatLng(
+          coffeeShop.coordinates.lat,
+          coffeeShop.coordinates.lng,
+        ),
         metadata: coffeeShop,
         visible: true,
       }));
@@ -76,16 +79,11 @@ export default class App extends React.Component<Props, State> {
   }
 
   updateMapData(mapData: MapData[], updateFn: (data: MapData) => MapData) {
-    this.setState({mapData: _.map(mapData, updateFn)});
+    this.setState({ mapData: _.map(mapData, updateFn) });
   }
 
   render() {
-    const {
-      map,
-      mapData,
-      selectedFilter,
-      selectedCoffeeShop,
-    } = this.state;
+    const { map, mapData, selectedFilter, selectedCoffeeShop } = this.state;
     return (
       <div>
         <AppBar
@@ -94,7 +92,9 @@ export default class App extends React.Component<Props, State> {
           mapData={mapData}
           selectedFilter={selectedFilter}
           updateMapData={this.updateMapData}
-          onSelectFilter={(filter: FilterType) => this.setState({selectedFilter: filter})}
+          onSelectFilter={(filter: FilterType) =>
+            this.setState({ selectedFilter: filter })
+          }
         />
         {selectedCoffeeShop ? (
           <CoffeeShop
