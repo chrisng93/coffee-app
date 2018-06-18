@@ -70,11 +70,10 @@ export default class AppBar extends React.Component<Props, State> {
       selectedFilter,
     } = this.props;
     const { filtersOpen, autocompleteOpen, walkingTimeMin } = this.state;
-    console.log(autocompleteOpen);
     return (
       <div>
         <Toolbar className="app-bar">
-          {!autocompleteOpen && isSmallScreen ? (
+          {!autocompleteOpen || !isSmallScreen ? (
             <ToolbarGroup firstChild={true}>
               <h1>{TITLE}</h1>
             </ToolbarGroup>

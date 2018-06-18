@@ -47,7 +47,7 @@ body {
 }
 
 .search-text-delete {
-  margin-left: 8px;
+  margin-left: -28px;
   display: flex;
   align-items: center;
   z-index: 1;
@@ -73,6 +73,10 @@ body {
 @media only screen and (max-width: 991px) {
   .app-bar h1 {
     font-size: 18px;
+  }
+
+  .search-text-delete {
+    margin-left: 4px;
   }
 
   .filters {

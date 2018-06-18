@@ -219,7 +219,7 @@ export default class SearchBar extends React.Component<Props, State> {
             fullWidth={true}
             style={{
               height: '100%',
-              width: '90%',
+              width: isSmallScreen ? '90%' : '100%',
               lineHeight: '16px',
               overflow: 'hidden',
             }}
