@@ -37,7 +37,6 @@ interface State {
 }
 
 // TODO: Use redux.
-// TODO: Refactor map data filtering functions into file.
 export default class App extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
@@ -56,6 +55,7 @@ export default class App extends React.Component<Props, State> {
     this.updateMapData = this.updateMapData.bind(this);
     this.onSelectFilter = this.onSelectFilter.bind(this);
     this.onSelectLocation = this.onSelectLocation.bind(this);
+    this.onSetWalkingTime = this.onSetWalkingTime.bind(this);
   }
 
   componentDidMount() {
@@ -98,7 +98,6 @@ export default class App extends React.Component<Props, State> {
     let newMapData = mapData;
     if (updateFn) {
       newMapData = _.map(mapData, updateFn);
-      console.log(newMapData);
     }
     this.setState({ mapData: newMapData });
   }
@@ -166,14 +165,6 @@ export default class App extends React.Component<Props, State> {
     );
   }
 
-  onSetWalkingTime(newWalkingTimeMin: number) {
-    const { selectedLocation } = this.state;
-    if (selectedLocation) {
-      this.getAndRenderIsochrones(selectedLocation, newWalkingTimeMin);
-    }
-    this.setState({ walkingTimeMin: newWalkingTimeMin });
-  }
-
   onSelectLocation(location: google.maps.LatLng) {
     const { mapData, selectedFilter, walkingTimeMin } = this.state;
     if (!location) {
@@ -189,6 +180,14 @@ export default class App extends React.Component<Props, State> {
         this.getAndRenderIsochrones(location, walkingTimeMin),
       );
     }
+  }
+
+  onSetWalkingTime(newWalkingTimeMin: number) {
+    const { selectedLocation } = this.state;
+    if (selectedLocation) {
+      this.getAndRenderIsochrones(selectedLocation, newWalkingTimeMin);
+    }
+    this.setState({ walkingTimeMin: newWalkingTimeMin });
   }
 
   render() {
@@ -209,10 +208,8 @@ export default class App extends React.Component<Props, State> {
           selectedLocation={selectedLocation}
           walkingTimeMin={walkingTimeMin}
           onSelectFilter={this.onSelectFilter}
-          onSetWalkingTime={(newWalkingTimeMin: number) =>
-            this.setState({ walkingTimeMin: newWalkingTimeMin })
-          }
           onSelectLocation={this.onSelectLocation}
+          onSetWalkingTime={this.onSetWalkingTime}
         />
         {selectedCoffeeShop ? (
           <CoffeeShop

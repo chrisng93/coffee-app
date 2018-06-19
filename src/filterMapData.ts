@@ -15,7 +15,7 @@ export const filterMapData = (
   ]);
 };
 
-function composeFilterFns(data: MapData, filterFns: FilterMapDataFn[]) {
+const composeFilterFns = (data: MapData, filterFns: FilterMapDataFn[]) => {
   _.each(filterFns, filterFn => (data = filterFn(data)));
   return data;
 }
