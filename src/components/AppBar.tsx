@@ -3,7 +3,7 @@ import KeyboardArrowDown from 'material-ui/svg-icons/hardware/keyboard-arrow-dow
 import KeyboardArrowUp from 'material-ui/svg-icons/hardware/keyboard-arrow-up';
 import * as React from 'react';
 
-import { FilterType, MapData } from '../types';
+import { FilterType } from '../types';
 import Filters from './Filters';
 import SearchBar from './SearchBar';
 
@@ -13,17 +13,18 @@ interface Props {
   isSmallScreen: boolean;
   // Map for passing down to SearchBar.
   map: google.maps.Map;
-  // Data to render on map.
-  mapData: MapData[];
   // Currently selected filter. Null if none.
   selectedFilter: FilterType;
-  // Update map data based on input map data and update function.
-  updateMapData: (
-    mapData: MapData[],
-    updateFn: (data: MapData) => MapData,
-  ) => void;
+  // The google.maps.LatLng object of the selected location, if any.
+  selectedLocation: google.maps.LatLng;
+  // Time in min that the user wants to walk to get coffee.
+  walkingTimeMin: number;
   // Select a filter.
   onSelectFilter: (filter: FilterType) => void;
+  // Set the walking time to get coffee.
+  onSetWalkingTime: (walkingTimeDisplay: number) => void;
+  // Set the selected location.
+  onSelectLocation: (location: google.maps.LatLng) => void;
 }
 
 interface State {
@@ -31,8 +32,6 @@ interface State {
   filtersOpen: boolean;
   // Whether or not autocomplete is open.
   autocompleteOpen: boolean;
-  // Time in min that the user wants to walk to get coffee.
-  walkingTimeMin: number;
 }
 
 export default class AppBar extends React.Component<Props, State> {
@@ -41,35 +40,21 @@ export default class AppBar extends React.Component<Props, State> {
     this.state = {
       filtersOpen: false,
       autocompleteOpen: false,
-      walkingTimeMin: 10,
     };
-    this.updateDataFromFilterFn = this.updateDataFromFilterFn.bind(this);
-  }
-
-  updateDataFromFilterFn(data: MapData, selectedFilter: FilterType) {
-    if (!selectedFilter) {
-      data.visible = true;
-    } else if (selectedFilter === 'coffee') {
-      // NOTE: has_good_coffee is not implemented yet.
-      data.visible = data.metadata.has_good_coffee;
-    } else if (selectedFilter === 'study') {
-      data.visible = data.metadata.is_good_for_studying;
-    } else {
-      // NOTE: is_instagrammable is not implemented yet.
-      data.visible = data.metadata.is_instagrammable;
-    }
-    return data;
   }
 
   render() {
     const {
       isSmallScreen,
       map,
-      mapData,
-      updateMapData,
       selectedFilter,
+      selectedLocation,
+      walkingTimeMin,
+      onSelectFilter,
+      onSetWalkingTime,
+      onSelectLocation,
     } = this.props;
-    const { filtersOpen, autocompleteOpen, walkingTimeMin } = this.state;
+    const { filtersOpen, autocompleteOpen } = this.state;
     return (
       <div>
         <Toolbar className="app-bar">
@@ -82,15 +67,11 @@ export default class AppBar extends React.Component<Props, State> {
             <SearchBar
               isSmallScreen={isSmallScreen}
               map={map}
-              mapData={mapData}
-              updateMapData={updateMapData}
-              walkingTimeMin={walkingTimeMin}
-              updateDataFilter={(data: MapData) =>
-                this.updateDataFromFilterFn(data, selectedFilter)
-              }
+              selectedLocation={selectedLocation}
               setAutocompleteOpen={(autocompleteOpen: boolean) =>
                 this.setState({ autocompleteOpen })
               }
+              onSelectLocation={onSelectLocation}
             />
           </ToolbarGroup>
           <ToolbarGroup lastChild={true}>
@@ -101,14 +82,10 @@ export default class AppBar extends React.Component<Props, State> {
         </Toolbar>
         {filtersOpen ? (
           <Filters
-            {...this.props}
-            updateMapData={(updateFn: (data: MapData) => MapData) =>
-              updateMapData(mapData, updateFn)
-            }
-            updateDataFromFilterFn={this.updateDataFromFilterFn}
-            setWalkingTime={(newWalkingTimeMin: number) =>
-              this.setState({ walkingTimeMin: newWalkingTimeMin })
-            }
+            selectedFilter={selectedFilter}
+            onSelectFilter={onSelectFilter}
+            onSetWalkingTime={onSetWalkingTime}
+            walkingTimeMin={walkingTimeMin}
           />
         ) : null}
       </div>

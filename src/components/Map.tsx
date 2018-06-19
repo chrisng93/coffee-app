@@ -47,7 +47,7 @@ export default class Map extends React.Component<Props, State> {
     this.map = new google.maps.Map(document.getElementById('map'), {
       center,
       zoom,
-      minZoom: 14,
+      minZoom: 12,
       maxZoom: 18,
       styles: mapStyles || [],
       fullscreenControl: false,

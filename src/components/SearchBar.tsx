@@ -3,26 +3,16 @@ import * as colors from 'material-ui/styles/colors';
 import * as React from 'react';
 import * as _ from 'underscore';
 
-import { MapData } from '../types';
-import { getRequest } from '../fetch';
-
 interface Props {
   isSmallScreen: boolean;
   // Google Map used for places service.
   map: google.maps.Map;
-  // Data to render on map.
-  mapData: MapData[];
-  // Update map data based on input map data and update function.
-  updateMapData: (
-    mapData: MapData[],
-    updateFn: (data: MapData) => MapData,
-  ) => void;
-  // Filter map data based on selected filter.
-  updateDataFilter: (data: MapData) => MapData;
-  // Time in min that the user wants to walk to get coffee.
-  walkingTimeMin: number;
+  // The google.maps.LatLng object of the selected location, if any.
+  selectedLocation: google.maps.LatLng;
   // Update autocomplete open state in AppBar.
   setAutocompleteOpen: (open: boolean) => void;
+  // Set the selected location.
+  onSelectLocation: (location: google.maps.LatLng) => void;
 }
 
 interface State {
@@ -99,13 +89,7 @@ export default class SearchBar extends React.Component<Props, State> {
   }
 
   onSelectPrediction(selection: google.maps.places.AutocompletePrediction) {
-    const {
-      map,
-      mapData,
-      updateMapData,
-      walkingTimeMin,
-      setAutocompleteOpen,
-    } = this.props;
+    const {onSelectLocation} = this.props;
     this.places.getDetails(
       { placeId: selection.place_id },
       async (result, status) => {
@@ -114,49 +98,8 @@ export default class SearchBar extends React.Component<Props, State> {
             console.error(`Places failure: ${status}`);
             return;
           }
-          const lat = result.geometry.location.lat();
-          const lng = result.geometry.location.lng();
 
-          const isochrones = await getRequest<number[][]>(
-            `http://localhost:8080/isochrone?origin=${lat},${lng}&walking_time_min=${walkingTimeMin}`,
-          );
-          const isochroneLatLngs = _.map(isochrones, isochrone => ({
-            lat: isochrone[0],
-            lng: isochrone[1],
-          }));
-
-          map.panTo(result.geometry.location);
-
-          // Add origin/isochrones and hide coffee shops that aren't within the specified
-          // walking distance.
-          const newData = [
-            {
-              id: 'origin',
-              geometry: new google.maps.LatLng(lat, lng),
-              visible: true,
-            },
-            {
-              id: 'isochrones',
-              geometry: new google.maps.Data.Polygon([isochroneLatLngs]),
-              visible: true,
-            },
-          ];
-
-          // We need to create this polygon to use the google.maps.geometry.poly.containsLocation method.
-          const polygon = new google.maps.Polygon({ paths: isochroneLatLngs });
-          updateMapData(mapData.concat(newData), (data: MapData) => {
-            if (
-              data.geometry instanceof google.maps.LatLng &&
-              !google.maps.geometry.poly.containsLocation(
-                data.geometry,
-                polygon,
-              )
-            ) {
-              data.visible = false;
-            }
-            return data;
-          });
-
+          onSelectLocation(result.geometry.location);
           this.setState({
             searchText: selection.description.toLowerCase(),
             predictions: [],
@@ -193,15 +136,7 @@ export default class SearchBar extends React.Component<Props, State> {
   }
 
   clearSearch() {
-    const { mapData, updateMapData, updateDataFilter } = this.props;
-    updateMapData(mapData, (data: MapData) => {
-      if (data.id === 'origin' || data.id === 'isochrones') {
-        data.visible = false;
-      } else {
-        data = updateDataFilter(data);
-      }
-      return data;
-    });
+    this.props.onSelectLocation(null);
     this.setState({ searchText: '', predictions: [], selectedPrediction: -1 });
   }
 

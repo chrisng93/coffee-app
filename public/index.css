@@ -60,7 +60,6 @@ body {
 .filters {
   position: absolute;
   top: 64px;
-  left: 0;
   right: 0;
   height: 160px;
   padding: 24px;

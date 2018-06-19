@@ -1,8 +1,10 @@
 const path = require('path');
 const webpack = require('webpack');
 
+const isProd = process.env.ENVIRONMENT === 'production';
+
 module.exports = {
-  mode: 'development',
+  mode: isProd ? 'production' : 'development',
   entry: './src/index.tsx',
   output: {
     filename: 'bundle.js',

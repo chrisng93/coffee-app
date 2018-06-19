@@ -1,128 +1,75 @@
-import { Checkbox, Slider } from 'material-ui';
+import { Checkbox, TextField } from 'material-ui';
 import * as colors from 'material-ui/styles/colors';
 import * as React from 'react';
-import * as _ from 'underscore';
 
 import { FilterType, MapData } from '../types';
 
 interface Props {
   // Currently selected filter. Null if none.
   selectedFilter: FilterType;
-  // Update map data based on update function.
-  updateMapData: (updateFn: (data: MapData) => MapData) => void;
   // Set the walking time to get coffee.
-  setWalkingTime: (walkingTimeMin: number) => void;
+  onSetWalkingTime: (walkingTimeDisplay: number) => void;
   // Select a filter.
   onSelectFilter: (filter: FilterType) => void;
-  // Update map data based on selected filter.
-  updateDataFromFilterFn: (
-    data: MapData,
-    selectedFilter: FilterType,
-  ) => MapData;
+  // Time in min that the user wants to walk to get coffee. This is the actual value, rather than
+  // the display in the text field.
+  walkingTimeMin: number;
 }
 
-// Render all options for coffee filters. Shown when coffee filter is selected.
-const renderCoffeeFilters = () => (
-  <div style={{ display: 'flex', flex: 1 }}>
-    <div style={{ flex: 1 }}>
-      <h3>Types</h3>
-      <div>
-        <Checkbox label="Cold brew" />
-        <Checkbox label="Matcha" />
-      </div>
-    </div>
-    <div style={{ flex: 1 }}>
-      <h3>Milk Substitutes</h3>
-      <div>
-        <Checkbox label="Oat milk" />
-        <Checkbox label="Almond milk" />
-      </div>
-    </div>
-  </div>
-);
+interface State {
+  walkingTimeDisplay: number | string;
+  walkingTimeError: string;
+}
 
-const selectFilter = (
-  updateMapData: (updateFn: (data: MapData) => MapData) => void,
-  onSelectFilter: (filter: FilterType) => void,
-  updateDataFromFilterFn: (
-    data: MapData,
-    selectedFilter: FilterType,
-  ) => MapData,
-  filter: FilterType,
-) => {
-  updateMapData((data: MapData) => updateDataFromFilterFn(data, filter));
-  onSelectFilter(filter);
-};
+export default class Filters extends React.Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      walkingTimeDisplay: props.walkingTimeMin,
+      walkingTimeError: '',
+    };
+  }
 
-// Filters define the options for the end user to filter out coffee shops. Currently not in use.
-// Most of the functionality for the filters isn't implemented on the backend yet.
-const Filters = ({
-  selectedFilter,
-  updateMapData,
-  onSelectFilter,
-  updateDataFromFilterFn,
-  setWalkingTime,
-}: Props) => (
-  <div className="filters">
-    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-      <div style={{ flex: 1 }}>
-        <div>
-          Walking time
-          <Slider
-            defaultValue={5}
-            min={1}
-            max={30}
-            step={1}
-            style={{ color: colors.blueGrey500 }}
-            sliderStyle={{ color: colors.blueGrey500 }}
-            onChange={(event, val) =>
-              _.debounce(() => setWalkingTime(val), 100)()
-            }
-          />
-        </div>
-        <h2>I want...</h2>
-        <div>
-          <Checkbox
-            label="Good coffee"
-            checked={selectedFilter === 'coffee'}
-            onCheck={(e, isInputChecked) =>
-              selectFilter(
-                updateMapData,
-                onSelectFilter,
-                updateDataFromFilterFn,
-                isInputChecked ? 'coffee' : null,
-              )
-            }
-          />
-          <Checkbox
-            label="To study"
-            checked={selectedFilter === 'study'}
-            onCheck={(e, isInputChecked) =>
-              selectFilter(
-                updateMapData,
-                onSelectFilter,
-                updateDataFromFilterFn,
-                isInputChecked ? 'study' : null,
-              )
-            }
-          />
-          <Checkbox
-            label="To do it for the gram"
-            checked={selectedFilter === 'gram'}
-            onCheck={(e, isInputChecked) =>
-              selectFilter(
-                updateMapData,
-                onSelectFilter,
-                updateDataFromFilterFn,
-                isInputChecked ? 'gram' : null,
-              )
-            }
-          />
+  componentWillReceiveProps(nextProps: Props) {
+    if (this.props.walkingTimeMin !== nextProps.walkingTimeMin) {
+      this.setState({walkingTimeDisplay: nextProps.walkingTimeMin});
+    }
+  }
+
+  onWalkingTimeInputChanged(val: string) {
+    const numVal = val === '' ? 0 : parseInt(val);
+    if (isNaN(numVal)) {
+      this.setState({walkingTimeDisplay: val, walkingTimeError: 'Please enter a valid number'});
+      return;
+    }
+    this.props.onSetWalkingTime(numVal);
+    this.setState({walkingTimeDisplay: numVal, walkingTimeError: ''});
+  }
+
+  render() {
+    const {walkingTimeDisplay, walkingTimeError} = this.state;
+    const {selectedFilter, onSelectFilter} = this.props;
+    return (
+      <div className="filters">
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div style={{ flex: 1 }}>
+            <TextField
+              value={walkingTimeDisplay || ''}
+              floatingLabelText="Walking time (minutes)"
+              errorText={walkingTimeDisplay !== '' && walkingTimeError}
+              floatingLabelFocusStyle={{color: colors.blueGrey700}}
+              underlineFocusStyle={{borderColor: colors.blueGrey700}}
+              onChange={(event, val) => this.onWalkingTimeInputChanged(val)}
+            />
+            {/* TODO: Add good coffee / instagrammable filters. */}
+            <Checkbox
+              label="Good for studying"
+              checked={selectedFilter === 'study'}
+              onCheck={(e, isInputChecked) => onSelectFilter(isInputChecked ? 'study' : null)}
+            />
+          </div>
         </div>
       </div>
-      {selectedFilter === 'coffee' ? renderCoffeeFilters() : null}
-    </div>
-  </div>
-);
-
-export default Filters;
+    );
+  }
+}
