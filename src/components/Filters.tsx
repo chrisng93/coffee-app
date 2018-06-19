@@ -32,23 +32,26 @@ export default class Filters extends React.Component<Props, State> {
 
   componentWillReceiveProps(nextProps: Props) {
     if (this.props.walkingTimeMin !== nextProps.walkingTimeMin) {
-      this.setState({walkingTimeDisplay: nextProps.walkingTimeMin});
+      this.setState({ walkingTimeDisplay: nextProps.walkingTimeMin });
     }
   }
 
   onWalkingTimeInputChanged(val: string) {
     const numVal = val === '' ? 0 : parseInt(val);
     if (isNaN(numVal)) {
-      this.setState({walkingTimeDisplay: val, walkingTimeError: 'Please enter a valid number'});
+      this.setState({
+        walkingTimeDisplay: val,
+        walkingTimeError: 'Please enter a valid number',
+      });
       return;
     }
     this.props.onSetWalkingTime(numVal);
-    this.setState({walkingTimeDisplay: numVal, walkingTimeError: ''});
+    this.setState({ walkingTimeDisplay: numVal, walkingTimeError: '' });
   }
 
   render() {
-    const {walkingTimeDisplay, walkingTimeError} = this.state;
-    const {selectedFilter, onSelectFilter} = this.props;
+    const { walkingTimeDisplay, walkingTimeError } = this.state;
+    const { selectedFilter, onSelectFilter } = this.props;
     return (
       <div className="filters">
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -57,15 +60,17 @@ export default class Filters extends React.Component<Props, State> {
               value={walkingTimeDisplay || ''}
               floatingLabelText="Walking time (minutes)"
               errorText={walkingTimeDisplay !== '' && walkingTimeError}
-              floatingLabelFocusStyle={{color: colors.blueGrey700}}
-              underlineFocusStyle={{borderColor: colors.blueGrey700}}
+              floatingLabelFocusStyle={{ color: colors.blueGrey700 }}
+              underlineFocusStyle={{ borderColor: colors.blueGrey700 }}
               onChange={(event, val) => this.onWalkingTimeInputChanged(val)}
             />
             {/* TODO: Add good coffee / instagrammable filters. */}
             <Checkbox
               label="Good for studying"
               checked={selectedFilter === 'study'}
-              onCheck={(e, isInputChecked) => onSelectFilter(isInputChecked ? 'study' : null)}
+              onCheck={(e, isInputChecked) =>
+                onSelectFilter(isInputChecked ? 'study' : null)
+              }
             />
           </div>
         </div>

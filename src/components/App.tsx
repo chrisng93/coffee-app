@@ -3,7 +3,7 @@ import * as _ from 'underscore';
 
 import { CoffeeShopModel, Coordinates, FilterType, MapData } from '../types';
 import { getRequest } from '../fetch';
-import {composeFilterFns, filterOnFilterType, filterOnIsochrone} from '../filterMapData';
+import { filterMapData } from '../filterMapData';
 import MAP_STYLES from '../mapStyles';
 import AppBar from './AppBar';
 import CoffeeShop from './CoffeeShop';
@@ -31,8 +31,9 @@ interface State {
   selectedLocation: google.maps.LatLng;
   // Time in min that the user wants to walk to get coffee.
   walkingTimeMin: number;
-  // Array of Coordinates for the isochrones.
-  isochroneLatLngs: Coordinates[];
+  // Polygon for the isochrones. Used for determining if a coffee shop should be visible (if
+  // isochrones exist).
+  isochronePolygon: google.maps.Polygon;
 }
 
 // TODO: Use redux.
@@ -47,12 +48,13 @@ export default class App extends React.Component<Props, State> {
       selectedCoffeeShop: null,
       selectedLocation: null,
       walkingTimeMin: 10,
-      isochroneLatLngs: null,
+      isochronePolygon: null,
     };
     this.setMap = this.setMap.bind(this);
     this.onFeatureClick = this.onFeatureClick.bind(this);
     this.getAndRenderIsochrones = this.getAndRenderIsochrones.bind(this);
     this.updateMapData = this.updateMapData.bind(this);
+    this.onSelectFilter = this.onSelectFilter.bind(this);
     this.onSelectLocation = this.onSelectLocation.bind(this);
   }
 
@@ -96,49 +98,32 @@ export default class App extends React.Component<Props, State> {
     let newMapData = mapData;
     if (updateFn) {
       newMapData = _.map(mapData, updateFn);
-    }
-    // We must do the filtering for shops inside the isochrone *after* we filter the map for other
-    // reasons.
-    const {isochroneLatLngs} = this.state;
-    if (isochroneLatLngs) {
-      // We need to create this polygon to use the google.maps.geometry.poly.containsLocation method.
-      const polygon = new google.maps.Polygon({ paths: isochroneLatLngs });
-      newMapData = _.map(newMapData, (data: MapData) => {
-        // Hide coffee shops outside of the isochrone area.
-        if (
-          data.geometry instanceof google.maps.LatLng &&
-          !google.maps.geometry.poly.containsLocation(
-            data.geometry,
-            polygon,
-          )
-        ) {
-          data.visible = false;
-        }
-        return data;
-      });
+      console.log(newMapData);
     }
     this.setState({ mapData: newMapData });
   }
 
-  async getAndRenderIsochrones(location: google.maps.LatLng, walkingTimeMin: number) {
-    const {map, mapData} = this.state;
+  async getAndRenderIsochrones(
+    location: google.maps.LatLng,
+    walkingTimeMin: number,
+  ) {
+    const { map, mapData, selectedFilter } = this.state;
     const lat = location.lat();
     const lng = location.lng();
-    const newData: MapData[] = [{
-      id: 'origin',
-      geometry: location,
-      visible: true,
-    }];
+    const newData: MapData[] = [
+      {
+        id: 'origin',
+        geometry: location,
+        visible: true,
+      },
+    ];
 
-    console.log('rendering with walking time', walkingTimeMin)
+    console.log('rendering with walking time', walkingTimeMin);
     // Remove isochrones if walking time not specified.
     if (walkingTimeMin === 0) {
-      this.updateMapData(mapData.concat(newData), (data: MapData) => {
-        if (data.id === 'isochrones') {
-          data.visible = false;
-        }
-        return data;
-      });
+      this.updateMapData(mapData.concat(newData), (data: MapData) =>
+        filterMapData(data, null, selectedFilter),
+      );
       return;
     }
 
@@ -150,9 +135,9 @@ export default class App extends React.Component<Props, State> {
       lat: isochrone[0],
       lng: isochrone[1],
     }));
-  
+
     map.panTo(location);
-  
+
     // Add origin/isochrones and hide coffee shops that aren't within the specified
     // walking distance.
     newData.push({
@@ -161,11 +146,28 @@ export default class App extends React.Component<Props, State> {
       visible: true,
     });
 
-    this.setState({isochroneLatLngs}, () => this.updateMapData(mapData.concat(newData), null));
+    // We need to create this polygon to use the google.maps.geometry.poly.containsLocation method.
+    const isochronePolygon = new google.maps.Polygon({
+      paths: isochroneLatLngs,
+    });
+    this.setState({ isochronePolygon }, () =>
+      this.updateMapData(mapData.concat(newData), (data: MapData) =>
+        filterMapData(data, isochronePolygon, selectedFilter),
+      ),
+    );
+  }
+
+  onSelectFilter(filter: FilterType) {
+    const { mapData, isochronePolygon } = this.state;
+    this.setState({ selectedFilter: filter }, () =>
+      this.updateMapData(mapData, (data: MapData) =>
+        filterMapData(data, isochronePolygon, filter),
+      ),
+    );
   }
 
   onSetWalkingTime(newWalkingTimeMin: number) {
-    const {selectedLocation} = this.state;
+    const { selectedLocation } = this.state;
     if (selectedLocation) {
       this.getAndRenderIsochrones(selectedLocation, newWalkingTimeMin);
     }
@@ -173,16 +175,31 @@ export default class App extends React.Component<Props, State> {
   }
 
   onSelectLocation(location: google.maps.LatLng) {
-    const {mapData, selectedFilter, walkingTimeMin} = this.state;
+    const { mapData, selectedFilter, walkingTimeMin } = this.state;
     if (!location) {
-      this.setState({selectedLocation: location, isochroneLatLngs: null}, () => this.updateMapData(mapData, (data: MapData) => composeFilterFns(data, [(data: MapData) => filterOnFilterType(data, selectedFilter), (data: MapData) => filterOnIsochrone(data, null)])));
+      this.setState(
+        { selectedLocation: location, isochronePolygon: null },
+        () =>
+          this.updateMapData(mapData, (data: MapData) =>
+            filterMapData(data, null, selectedFilter),
+          ),
+      );
     } else {
-      this.setState({selectedLocation: location}, () => this.getAndRenderIsochrones(location, walkingTimeMin));
+      this.setState({ selectedLocation: location }, () =>
+        this.getAndRenderIsochrones(location, walkingTimeMin),
+      );
     }
   }
 
   render() {
-    const { map, mapData, selectedFilter, selectedCoffeeShop, selectedLocation, walkingTimeMin } = this.state;
+    const {
+      map,
+      mapData,
+      selectedFilter,
+      selectedCoffeeShop,
+      selectedLocation,
+      walkingTimeMin,
+    } = this.state;
     return (
       <div>
         <AppBar
@@ -191,9 +208,7 @@ export default class App extends React.Component<Props, State> {
           selectedFilter={selectedFilter}
           selectedLocation={selectedLocation}
           walkingTimeMin={walkingTimeMin}
-          onSelectFilter={(filter: FilterType) =>
-            this.setState({ selectedFilter: filter })
-          }
+          onSelectFilter={this.onSelectFilter}
           onSetWalkingTime={(newWalkingTimeMin: number) =>
             this.setState({ walkingTimeMin: newWalkingTimeMin })
           }

@@ -89,7 +89,7 @@ export default class SearchBar extends React.Component<Props, State> {
   }
 
   onSelectPrediction(selection: google.maps.places.AutocompletePrediction) {
-    const {onSelectLocation} = this.props;
+    const { onSelectLocation } = this.props;
     this.places.getDetails(
       { placeId: selection.place_id },
       async (result, status) => {
