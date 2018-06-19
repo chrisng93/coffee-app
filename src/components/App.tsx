@@ -14,6 +14,9 @@ const NY_VIEW = {
   zoom: 14,
 };
 
+// TODO: Change this.
+const API_URL = 'http://localhost:8080';
+
 interface Props {
   isSmallScreen: boolean;
 }
@@ -64,10 +67,7 @@ export default class App extends React.Component<Props, State> {
 
   async getAndSetCoffeeShops() {
     try {
-      // TODO: Don't hardcore this API URL in.
-      const coffeeShops = await getRequest<CoffeeShopModel[]>(
-        'http://localhost:8080/coffee_shop',
-      );
+      const coffeeShops = await getRequest<CoffeeShopModel[]>(`${API_URL}/coffee_shop`);
       const data: MapData[] = _.map(coffeeShops, coffeeShop => ({
         id: `coffeeshop-${coffeeShop.id.toString()}`,
         geometry: new google.maps.LatLng(
@@ -88,10 +88,7 @@ export default class App extends React.Component<Props, State> {
   }
 
   onFeatureClick(event: google.maps.Data.MouseEvent) {
-    // TODO: Call API to get single coffee shop info.
-    this.setState({
-      selectedCoffeeShop: event.feature.getProperty('metadata'),
-    });
+    this.getCoffeeShopDetails(event.feature.getProperty('metadata').id);
   }
 
   updateMapData(mapData: MapData[], updateFn: (data: MapData) => MapData) {
@@ -126,34 +123,49 @@ export default class App extends React.Component<Props, State> {
       return;
     }
 
-    // Grab isochrones and render them if we have a valid walking time.
-    const isochrones = await getRequest<number[][]>(
-      `http://localhost:8080/isochrone?origin=${lat},${lng}&walking_time_min=${walkingTimeMin}`,
-    );
-    const isochroneLatLngs: Coordinates[] = _.map(isochrones, isochrone => ({
-      lat: isochrone[0],
-      lng: isochrone[1],
-    }));
+    try {
+      // Grab isochrones and render them if we have a valid walking time.
+      const isochrones = await getRequest<number[][]>(
+        `${API_URL}/isochrone?origin=${lat},${lng}&walking_time_min=${walkingTimeMin}`,
+      );
+      const isochroneLatLngs: Coordinates[] = _.map(isochrones, isochrone => ({
+        lat: isochrone[0],
+        lng: isochrone[1],
+      }));
+  
+      map.panTo(location);
+  
+      // Add origin/isochrones and hide coffee shops that aren't within the specified
+      // walking distance.
+      newData.push({
+        id: 'isochrones',
+        geometry: new google.maps.Data.Polygon([isochroneLatLngs]),
+        visible: true,
+      });
+  
+      // We need to create this polygon to use the google.maps.geometry.poly.containsLocation method.
+      const isochronePolygon = new google.maps.Polygon({
+        paths: isochroneLatLngs,
+      });
+      this.setState({ isochronePolygon }, () =>
+        this.updateMapData(mapData.concat(newData), (data: MapData) =>
+          filterMapData(data, isochronePolygon, selectedFilter),
+        ),
+      );
+    } catch (err) {
+      // TODO: Handle error.
+    }
+  }
 
-    map.panTo(location);
-
-    // Add origin/isochrones and hide coffee shops that aren't within the specified
-    // walking distance.
-    newData.push({
-      id: 'isochrones',
-      geometry: new google.maps.Data.Polygon([isochroneLatLngs]),
-      visible: true,
-    });
-
-    // We need to create this polygon to use the google.maps.geometry.poly.containsLocation method.
-    const isochronePolygon = new google.maps.Polygon({
-      paths: isochroneLatLngs,
-    });
-    this.setState({ isochronePolygon }, () =>
-      this.updateMapData(mapData.concat(newData), (data: MapData) =>
-        filterMapData(data, isochronePolygon, selectedFilter),
-      ),
-    );
+  async getCoffeeShopDetails(id: string) {
+    try {
+      const coffeeShop = await getRequest<CoffeeShopModel>(
+        `${API_URL}/coffee_shop/${id}`,
+      )
+      this.setState({selectedCoffeeShop: coffeeShop});
+    } catch (err) {
+      // TODO: Handle error.
+    }
   }
 
   onSelectFilter(filter: FilterType) {

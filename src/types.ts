@@ -17,6 +17,19 @@ export interface MapData {
   seen?: boolean;
 }
 
+interface DailyHours {
+  is_overnight: boolean;
+  start: string;
+  end: string;
+  day: number;
+}
+
+interface HoursOverview {
+  hours_type: string;
+  is_open_now: boolean;
+  open: DailyHours[];
+}
+
 // Maps to the coffee shop model we get back from the API.
 export interface CoffeeShopModel {
   id: number;
@@ -27,6 +40,14 @@ export interface CoffeeShopModel {
   yelp_url: string;
   has_good_coffee: boolean;
   is_good_for_studying: boolean;
+  // Keys below are added when getting coffee shop details.
+  photos?: string[];
+  location?: {
+    display_address: string[];
+  };
+  price?: string;
+  phone?: string;
+  hours: HoursOverview;
 }
 
 // Types of filters that the user can select.

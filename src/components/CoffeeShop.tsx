@@ -12,7 +12,8 @@ interface Props {
 
 const CoffeeShop = ({ coffeeShop, onCloseDialog }: Props) => (
   <Dialog open={coffeeShop !== null} onRequestClose={onCloseDialog}>
-    Coffee Shop
+    {coffeeShop.id}
+    {coffeeShop.name}
   </Dialog>
 );
 
