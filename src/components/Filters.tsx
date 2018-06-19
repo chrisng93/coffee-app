@@ -54,26 +54,22 @@ export default class Filters extends React.Component<Props, State> {
     const { selectedFilter, onSelectFilter } = this.props;
     return (
       <div className="filters">
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <div style={{ flex: 1 }}>
-            <TextField
-              value={walkingTimeDisplay || ''}
-              floatingLabelText="Walking time (minutes)"
-              errorText={walkingTimeDisplay !== '' && walkingTimeError}
-              floatingLabelFocusStyle={{ color: colors.blueGrey700 }}
-              underlineFocusStyle={{ borderColor: colors.blueGrey700 }}
-              onChange={(event, val) => this.onWalkingTimeInputChanged(val)}
-            />
-            {/* TODO: Add good coffee / instagrammable filters. */}
-            <Checkbox
-              label="Good for studying"
-              checked={selectedFilter === 'study'}
-              onCheck={(e, isInputChecked) =>
-                onSelectFilter(isInputChecked ? 'study' : null)
-              }
-            />
-          </div>
-        </div>
+        <TextField
+          value={walkingTimeDisplay || ''}
+          floatingLabelText="Walking time (minutes)"
+          errorText={walkingTimeDisplay !== '' && walkingTimeError}
+          floatingLabelFocusStyle={{ color: colors.blueGrey700 }}
+          underlineFocusStyle={{ borderColor: colors.blueGrey700 }}
+          onChange={(event, val) => this.onWalkingTimeInputChanged(val)}
+        />
+        {/* TODO: Add good coffee / instagrammable filters. */}
+        <Checkbox
+          label="Good for studying"
+          checked={selectedFilter === 'study'}
+          onCheck={(e, isInputChecked) =>
+            onSelectFilter(isInputChecked ? 'study' : null)
+          }
+        />
       </div>
     );
   }
