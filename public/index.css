@@ -71,6 +71,15 @@ body {
   opacity: 0.95;
 }
 
+.coffee-shop .header {
+  display: flex;
+  align-items: flex-end;
+}
+
+.coffee-shop .header div {
+  margin: auto 0 auto auto;
+}
+
 .coffee-shop img {
   object-fit: cover;
   width: 250px;

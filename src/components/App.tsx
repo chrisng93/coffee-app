@@ -162,6 +162,7 @@ export default class App extends React.Component<Props, State> {
       const coffeeShop = await getRequest<CoffeeShopModel>(
         `${API_URL}/coffee_shop/${id}`,
       )
+      console.log(coffeeShop)
       this.setState({selectedCoffeeShop: coffeeShop});
     } catch (err) {
       // TODO: Handle error.

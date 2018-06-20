@@ -17,7 +17,7 @@ export interface MapData {
   seen?: boolean;
 }
 
-interface DailyHours {
+export interface DailyHours {
   is_overnight: boolean;
   start: string;
   end: string;
@@ -47,7 +47,7 @@ export interface CoffeeShopModel {
   };
   price?: string;
   phone?: string;
-  hours: HoursOverview;
+  hours: HoursOverview[];
 }
 
 // Types of filters that the user can select.
