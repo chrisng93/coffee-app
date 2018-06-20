@@ -86,6 +86,38 @@ body {
   height: 250px;
 }
 
+.coffee-shop .info {
+  display: flex;
+  justify-content: center;
+}
+
+.coffee-shop .info .metadata {
+  margin: 16px 0;
+}
+
+.coffee-shop .info .metadata > div {
+  margin-bottom: 16px;
+}
+
+.coffee-shop .info .checkmark {
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.coffee-shop .info .checkmark > div {
+  margin-left: 8px;
+}
+
+.coffee-shop .info .hours {
+  margin-left: 108px;
+}
+
+.coffee-shop .info .hours h3 {
+  margin: 16px 0;
+  text-align: center;
+}
+
 /* Medium and down */
 @media only screen and (max-width: 991px) {
   .app-bar h1 {

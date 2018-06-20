@@ -7,15 +7,7 @@ interface Props {
   hours: DailyHours[];
 }
 
-const indexToHumanReadableDay: {[key: string]: string} = {
-  0: 'Mon',
-  1: 'Tue',
-  2: 'Wed',
-  3: 'Thu',
-  4: 'Fri',
-  5: 'Sat',
-  6: 'Sun',
-};
+const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 const militaryTimeToHumanReadableTime = (militaryTime: string) => {
   let hoursString = militaryTime.slice(0, 2);
@@ -36,12 +28,19 @@ const militaryTimeToHumanReadableTime = (militaryTime: string) => {
 
 const CoffeeShopHours = ({hours}: Props) =>
   <div className="hours">
-    {_.map(hours, hour =>
-      <div>
-        {indexToHumanReadableDay[hour.day]}
-        {militaryTimeToHumanReadableTime(hour.start)} - {militaryTimeToHumanReadableTime(hour.end)}
+    <h3>Hours</h3>
+    <div style={{display: 'flex'}}>
+      <div style={{marginRight: '16px'}}>
+        {_.map(days, day => <div key={day}>{day}</div>)}
       </div>
-    )}
+      <div>
+        {_.map(hours, hour =>
+          <div key={hour.day}>
+            {militaryTimeToHumanReadableTime(hour.start)} - {militaryTimeToHumanReadableTime(hour.end)}
+          </div>
+        )}
+      </div>
+    </div>
   </div>
 
 export default CoffeeShopHours;

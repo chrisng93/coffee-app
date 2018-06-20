@@ -17,6 +17,82 @@ const NY_VIEW = {
 // TODO: Change this.
 const API_URL = 'http://localhost:8080';
 
+const testCoffeeShop = {
+  "id": 7,
+  "name": "Blue Bottle Coffee",
+  "coordinates": {
+      "lat": 40.68736,
+      "lng": -73.9897699
+  },
+  "yelp_id": "mRZaqNJqpS4YnRnCVRO5fQ",
+  "yelp_url": "https://www.yelp.com/biz/blue-bottle-coffee-brooklyn-7?adjust_creative=yEWd7aXEfny_E9-8M2rG0Q&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=yEWd7aXEfny_E9-8M2rG0Q",
+  "has_good_coffee": false,
+  "is_good_for_studying": false,
+  "photos": [
+      "https://s3-media2.fl.yelpcdn.com/bphoto/1Vs9RjmyxVTXFizusvPSvw/o.jpg",
+      "https://s3-media2.fl.yelpcdn.com/bphoto/Wm8tIfg1A3rSRvz5KQ1f2A/o.jpg",
+      "https://s3-media3.fl.yelpcdn.com/bphoto/m1i0uj3dU9ZalJ4kPAr_AQ/o.jpg"
+  ],
+  "location": {
+      "display_address": [
+          "85 Dean St",
+          "Brooklyn, NY 11201"
+      ]
+  },
+  "price": "$$",
+  "phone": "+15106533394",
+  "hours": [
+      {
+          "hours_type": "REGULAR",
+          "open": [
+              {
+                  "is_overnight": false,
+                  "start": "0700",
+                  "end": "1900",
+                  "day": 0
+              },
+              {
+                  "is_overnight": false,
+                  "start": "0700",
+                  "end": "1900",
+                  "day": 1
+              },
+              {
+                  "is_overnight": false,
+                  "start": "0700",
+                  "end": "1900",
+                  "day": 2
+              },
+              {
+                  "is_overnight": false,
+                  "start": "0700",
+                  "end": "1900",
+                  "day": 3
+              },
+              {
+                  "is_overnight": false,
+                  "start": "0700",
+                  "end": "1900",
+                  "day": 4
+              },
+              {
+                  "is_overnight": false,
+                  "start": "0700",
+                  "end": "1900",
+                  "day": 5
+              },
+              {
+                  "is_overnight": false,
+                  "start": "0700",
+                  "end": "1900",
+                  "day": 6
+              }
+          ],
+          "is_open_now": false
+      }
+  ]
+};
+
 interface Props {
   isSmallScreen: boolean;
 }
