@@ -211,10 +211,11 @@ export default class App extends React.Component<Props, State> {
       selectedLocation,
       walkingTimeMin,
     } = this.state;
+    const {isSmallScreen} = this.props;
     return (
       <div>
         <AppBar
-          isSmallScreen={this.props.isSmallScreen}
+          isSmallScreen={isSmallScreen}
           map={map}
           selectedFilter={selectedFilter}
           selectedLocation={selectedLocation}
@@ -225,6 +226,7 @@ export default class App extends React.Component<Props, State> {
         />
         {selectedCoffeeShop ? (
           <CoffeeShop
+            isSmallScreen={isSmallScreen}
             coffeeShop={selectedCoffeeShop}
             onCloseDialog={() => this.setState({ selectedCoffeeShop: null })}
           />
