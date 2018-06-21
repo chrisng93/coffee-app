@@ -1,3 +1,4 @@
+import {Snackbar} from 'material-ui';
 import * as React from 'react';
 import * as _ from 'underscore';
 
@@ -98,6 +99,10 @@ interface Props {
 }
 
 interface State {
+  // Whether the app has an unexpected error.
+  hasError: boolean;
+  // Error message for the app.
+  errorMessage: string;
   // Map for passing down to SearchBar.
   map: google.maps.Map;
   // Data for rendering features on map.
@@ -120,6 +125,8 @@ export default class App extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
+      hasError: false,
+      errorMessage: null,
       map: null,
       mapData: [],
       selectedFilter: null,
@@ -129,6 +136,7 @@ export default class App extends React.Component<Props, State> {
       isochronePolygon: null,
     };
     this.setMap = this.setMap.bind(this);
+    this.onMapClick = this.onMapClick.bind(this);
     this.onFeatureClick = this.onFeatureClick.bind(this);
     this.getAndRenderIsochrones = this.getAndRenderIsochrones.bind(this);
     this.updateMapData = this.updateMapData.bind(this);
@@ -141,6 +149,10 @@ export default class App extends React.Component<Props, State> {
     this.getAndSetCoffeeShops();
   }
 
+  componentDidCatch() {
+    this.setState({ hasError: true });
+  }
+
   async getAndSetCoffeeShops() {
     try {
       const coffeeShops = await getRequest<CoffeeShopModel[]>(`${API_URL}/coffee_shop`);
@@ -151,16 +163,21 @@ export default class App extends React.Component<Props, State> {
           coffeeShop.coordinates.lng,
         ),
         metadata: coffeeShop,
+        icon: './assets/coffee_pin.png',
         visible: true,
       }));
       this.setState({ mapData: this.state.mapData.concat(data) });
     } catch (err) {
-      // TODO: Error state.
+      this.setState({errorMessage: 'Error getting coffee shops.'});
     }
   }
 
   setMap(newMap: google.maps.Map) {
     this.setState({ map: newMap });
+  }
+
+  onMapClick(event: google.maps.Data.MouseEvent) {
+    this.onSelectLocation(event.latLng);
   }
 
   onFeatureClick(event: google.maps.Data.MouseEvent) {
@@ -238,7 +255,7 @@ export default class App extends React.Component<Props, State> {
         ),
       );
     } catch (err) {
-      // TODO: Handle error.
+      this.setState({errorMessage: 'Error getting isochrones.'});
     }
   }
 
@@ -250,7 +267,7 @@ export default class App extends React.Component<Props, State> {
       console.log(coffeeShop)
       this.setState({selectedCoffeeShop: coffeeShop});
     } catch (err) {
-      // TODO: Handle error.
+      this.setState({errorMessage: 'Error getting coffee shop details.'});
     }
   }
 
@@ -290,6 +307,8 @@ export default class App extends React.Component<Props, State> {
 
   render() {
     const {
+      hasError,
+      errorMessage,
       map,
       mapData,
       selectedFilter,
@@ -298,8 +317,17 @@ export default class App extends React.Component<Props, State> {
       walkingTimeMin,
     } = this.state;
     const {isSmallScreen} = this.props;
+    if (hasError) {
+      return <h1>Something went wrong. Please refresh your page.</h1>;
+    }
     return (
       <div>
+        <Snackbar
+          open={errorMessage !== null}
+          message={errorMessage}
+          onRequestClose={() => this.setState({errorMessage: null})}
+          autoHideDuration={2000}
+        />
         <AppBar
           isSmallScreen={isSmallScreen}
           map={map}
@@ -322,6 +350,7 @@ export default class App extends React.Component<Props, State> {
           {...NY_VIEW}
           mapStyles={MAP_STYLES}
           mapData={mapData}
+          onMapClick={this.onMapClick}
           onFeatureClick={this.onFeatureClick}
         />
       </div>

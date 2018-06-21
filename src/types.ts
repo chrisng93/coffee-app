@@ -10,9 +10,10 @@ export interface MapData {
   geometry: google.maps.Data.Geometry | google.maps.LatLng;
   // Whether or not the data should be shown on the map.
   visible: boolean;
-  walkingRadiusOptions?: { [key: string]: any };
   // Metadata associated with data point. For example, this could be the CoffeeShop object.
   metadata?: { [key: string]: any };
+  // Link to a custom icon to use.
+  icon?: string;
   // Used when reconciling data.
   seen?: boolean;
 }

@@ -26,6 +26,7 @@ interface State {
 
 export default class SearchBar extends React.Component<Props, State> {
   private autocomplete: google.maps.places.AutocompleteService; // Google autocomplete service.
+  private geocoder: google.maps.Geocoder; // Google geocode service.
   private places: google.maps.places.PlacesService; // Google places service.
 
   constructor(props: Props) {
@@ -36,6 +37,7 @@ export default class SearchBar extends React.Component<Props, State> {
       selectedPrediction: -1,
     };
     this.autocomplete = new google.maps.places.AutocompleteService();
+    this.geocoder = new google.maps.Geocoder();
     this.clearSearch = this.clearSearch.bind(this);
   }
 
@@ -92,24 +94,31 @@ export default class SearchBar extends React.Component<Props, State> {
     const { onSelectLocation } = this.props;
     this.places.getDetails(
       { placeId: selection.place_id },
-      async (result, status) => {
-        try {
-          if (status !== google.maps.places.PlacesServiceStatus.OK) {
-            console.error(`Places failure: ${status}`);
-            return;
-          }
-
-          onSelectLocation(result.geometry.location);
-          this.setState({
-            searchText: selection.description.toLowerCase(),
-            predictions: [],
-            selectedPrediction: -1,
-          });
-        } catch (err) {
-          // TODO: Error state.
+      (result, status) => {
+        if (status !== google.maps.places.PlacesServiceStatus.OK) {
+          console.error(`Places failure: ${status}`);
+          return;
         }
+
+        onSelectLocation(result.geometry.location);
+        this.setState({
+          searchText: selection.description.toLowerCase(),
+          predictions: [],
+          selectedPrediction: -1,
+        });
       },
     );
+  }
+
+  onGeocode() {
+    this.geocoder.geocode({address: this.state.searchText, bounds: this.props.map.getBounds()}, (results, status) => {
+      if (status !== google.maps.GeocoderStatus.OK) {
+        console.error(`Places failure: ${status}`);
+        return;
+      }
+
+      this.setState({searchText: results[0].formatted_address, predictions: [], selectedPrediction: -1});
+    });
   }
 
   handleKeyDown(keyCode: number) {
@@ -126,9 +135,13 @@ export default class SearchBar extends React.Component<Props, State> {
       // Down arrow event, don't allow user to select more than the predictions array size.
       selectedPrediction++;
       this.setState({ selectedPrediction });
-    } else if (keyCode === 13 && selectedPrediction > -1) {
-      // Enter key event, we have an actual selection.
-      this.onSelectPrediction(predictions[selectedPrediction]);
+    } else if (keyCode === 13) {
+      if (selectedPrediction > -1) {
+        // Enter key event, we have an actual selection.
+        this.onSelectPrediction(predictions[selectedPrediction]);
+      } else {
+        this.onGeocode();
+      }
     } else if (keyCode === 27) {
       // Escape key event, reset the predictions.
       this.setState({ predictions: [], selectedPrediction: -1 });

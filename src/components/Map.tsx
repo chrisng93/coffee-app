@@ -16,6 +16,7 @@ interface Props {
   mapData: MapData[];
   // Custom styles for the basemap.
   mapStyles?: any[];
+  onMapClick?: (event: google.maps.Data.MouseEvent) => void;
   onFeatureClick?: (event: google.maps.Data.MouseEvent) => void;
   // Method for setting the Google Map.
   setMap?: (map: google.maps.Map) => void;
@@ -41,6 +42,7 @@ export default class Map extends React.Component<Props, State> {
       zoom,
       mapStyles,
       mapData,
+      onMapClick,
       onFeatureClick,
       setMap,
     } = this.props;
@@ -56,6 +58,9 @@ export default class Map extends React.Component<Props, State> {
     });
     if (setMap) {
       setMap(this.map);
+    }
+    if (onMapClick) {
+      this.map.addListener('click', onMapClick);
     }
     if (onFeatureClick) {
       this.map.data.addListener('click', onFeatureClick);
@@ -131,6 +136,14 @@ export default class Map extends React.Component<Props, State> {
       properties: { metadata: data.metadata },
     });
     this.map.data.add(feature);
+    if (data.icon) {
+      this.map.data.overrideStyle(feature, {
+        icon: {
+          url: data.icon,
+          scaledSize: new google.maps.Size(46, 46),
+        },
+      });
+    }
 
     // Special case for isochrones - fit the map to these bounds.
     if (data.id === 'isochrones') {
