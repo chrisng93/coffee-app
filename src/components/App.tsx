@@ -204,6 +204,15 @@ export default class App extends React.Component<Props, State> {
       const isochrones = await getRequest<number[][]>(
         `${API_URL}/isochrone?origin=${lat},${lng}&walking_time_min=${walkingTimeMin}`,
       );
+
+      // If a new request has come in after this request, exit out.
+      if (
+        this.state.selectedLocation !== location ||
+        this.state.walkingTimeMin !== walkingTimeMin
+      ) {
+        return;
+      }
+
       const isochroneLatLngs: Coordinates[] = _.map(isochrones, isochrone => ({
         lat: isochrone[0],
         lng: isochrone[1],
@@ -218,7 +227,7 @@ export default class App extends React.Component<Props, State> {
         geometry: new google.maps.Data.Polygon([isochroneLatLngs]),
         visible: true,
       });
-  
+ 
       // We need to create this polygon to use the google.maps.geometry.poly.containsLocation method.
       const isochronePolygon = new google.maps.Polygon({
         paths: isochroneLatLngs,
