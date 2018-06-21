@@ -181,7 +181,7 @@ export default class App extends React.Component<Props, State> {
   }
 
   onFeatureClick(event: google.maps.Data.MouseEvent) {
-    this.getCoffeeShopDetails(event.feature.getProperty('metadata').id);
+    this.getCoffeeShopDetails(event.feature.getProperty('metadata'));
   }
 
   updateMapData(mapData: MapData[], updateFn: (data: MapData) => MapData) {
@@ -259,16 +259,18 @@ export default class App extends React.Component<Props, State> {
     }
   }
 
-  async getCoffeeShopDetails(id: string) {
-    try {
-      const coffeeShop = await getRequest<CoffeeShopModel>(
-        `${API_URL}/coffee_shop/${id}`,
-      )
-      console.log(coffeeShop)
-      this.setState({selectedCoffeeShop: coffeeShop});
-    } catch (err) {
-      this.setState({errorMessage: 'Error getting coffee shop details.'});
-    }
+  getCoffeeShopDetails(coffeeShop: CoffeeShopModel) {
+    this.setState({selectedCoffeeShop: coffeeShop}, async () => {
+      try {
+        const coffeeShopWithDetails = await getRequest<CoffeeShopModel>(
+          `${API_URL}/coffee_shop/${coffeeShop.id}`,
+        )
+        console.log(coffeeShopWithDetails)
+        this.setState({selectedCoffeeShop: coffeeShopWithDetails});
+      } catch (err) {
+        this.setState({errorMessage: 'Error getting coffee shop details.'});
+      }
+    });
   }
 
   onSelectFilter(filter: FilterType) {
@@ -318,7 +320,7 @@ export default class App extends React.Component<Props, State> {
     } = this.state;
     const {isSmallScreen} = this.props;
     if (hasError) {
-      return <h1>Something went wrong. Please refresh your page.</h1>;
+      return <h1 style={{textAlign: 'center'}}>Something went wrong. Please refresh your page.</h1>;
     }
     return (
       <div>

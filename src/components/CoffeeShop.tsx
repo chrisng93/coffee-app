@@ -40,28 +40,30 @@ const CoffeeShop = ({isSmallScreen, coffeeShop, onCloseDialog}: Props) =>
     contentStyle={{maxWidth: '850px'}}
     open={coffeeShop !== null} onRequestClose={onCloseDialog}
   >
-    <div className="coffee-shop">
-      {coffeeShop.id}
-      <div className="header">
-        <h2>{coffeeShop.name}</h2>
-        <div>{coffeeShop.price}</div>
-      </div>
-      {renderImages(coffeeShop.photos, isSmallScreen)}
-      <div className="info">
-        <div className="metadata">
-          <div>
-            <div>{coffeeShop.location.display_address[0]}</div>
-            <div>{coffeeShop.location.display_address[1]}</div>
+    {coffeeShop.price // Every Yelp business has a price rating, so use this as a proxy for
+                      // "loaded" state.
+      ? <div className="coffee-shop">
+          <div className="header">
+            <h2>{coffeeShop.name}</h2>
+            <div>{coffeeShop.price}</div>
           </div>
-          <div>{formatPhoneNumber(coffeeShop.phone)}</div>
-          <div>
-            {renderCheckmark('Open now', coffeeShop.hours && coffeeShop.hours[0].is_open_now)}
-            {renderCheckmark('Good for studying', coffeeShop.is_good_for_studying)}
+          {coffeeShop.photos ? renderImages(coffeeShop.photos, isSmallScreen) : null}
+          <div className="info">
+            <div className="metadata">
+              <div>
+                <div>{coffeeShop.location && coffeeShop.location.display_address && coffeeShop.location.display_address[0]}</div>
+                <div>{coffeeShop.location && coffeeShop.location.display_address && coffeeShop.location.display_address[1]}</div>
+              </div>
+              <div>{coffeeShop.phone ? formatPhoneNumber(coffeeShop.phone) : null}</div>
+              <div>
+                {coffeeShop.hours && coffeeShop.hours.length ? renderCheckmark('Open now', coffeeShop.hours[0].is_open_now) : null}
+                {renderCheckmark('Good for studying', coffeeShop.is_good_for_studying)}
+              </div>
+            </div>
+            {coffeeShop.hours && coffeeShop.hours.length ? <CoffeeShopHours hours={coffeeShop.hours && coffeeShop.hours[0].open} /> : null}
           </div>
         </div>
-        <CoffeeShopHours hours={coffeeShop.hours && coffeeShop.hours[0].open} />
-      </div>
-    </div>
+      : null}
   </Dialog>
 
 export default CoffeeShop;
