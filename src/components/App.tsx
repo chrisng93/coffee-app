@@ -8,6 +8,7 @@ import MAP_STYLES from '../mapStyles';
 import { CoffeeShopModel, Coordinates, FilterType, MapData } from '../types';
 import {
   coffeeShopsToMapData,
+  originToMapData,
   isochronesToCoordinatesAndMapData,
 } from '../transform';
 import AppBar from './AppBar';
@@ -124,13 +125,7 @@ export default class App extends React.Component<Props, State> {
       const { map, mapData, selectedFilter } = this.state;
       const lat = location.lat();
       const lng = location.lng();
-      const newData: MapData[] = [
-        {
-          id: 'origin',
-          geometry: location,
-          visible: true,
-        },
-      ];
+      const newData: MapData[] = [originToMapData(location)];
 
       console.log('rendering with walking time', walkingTimeMin);
       // Remove isochrones if walking time not specified.

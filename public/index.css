@@ -90,6 +90,16 @@ body {
   align-items: flex-end;
 }
 
+.coffee-shop .header a {
+  text-decoration: none;
+  color: #455A64; /* blueGrey700 */
+  transition: color 0.5s ease;
+}
+
+.coffee-shop .header a:hover {
+  color: #90A4AE; /* blueGrey300 */
+}
+
 .coffee-shop .header div {
   margin: auto 0 auto auto;
 }

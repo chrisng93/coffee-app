@@ -55,7 +55,7 @@ const CoffeeShop = ({ isSmallScreen, coffeeShop, onCloseDialog }: Props) => (
       // "loaded" state.
       <div className="coffee-shop">
         <div className="header">
-          <h2>{coffeeShop.name}</h2>
+          <h2><a href={coffeeShop.yelp_url} target="_blank">{coffeeShop.name}</a></h2>
           <div>{coffeeShop.price}</div>
         </div>
         {coffeeShop.photos

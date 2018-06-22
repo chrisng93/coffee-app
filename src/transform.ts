@@ -17,6 +17,12 @@ export const coffeeShopsToMapData = (
   }));
 };
 
+export const originToMapData = (location: google.maps.LatLng) => ({
+  id: 'origin',
+  geometry: location,
+  visible: true,
+});
+
 export const isochronesToCoordinatesAndMapData = (isochrones: number[][]) => {
   const isochroneLatLngs: Coordinates[] = _.map(isochrones, isochrone => ({
     lat: isochrone[0],
