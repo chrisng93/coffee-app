@@ -2,10 +2,11 @@ import {Snackbar} from 'material-ui';
 import * as React from 'react';
 import * as _ from 'underscore';
 
-import { CoffeeShopModel, Coordinates, FilterType, MapData } from '../types';
-import { getRequest } from '../fetch';
+import { getCoffeeShop, getCoffeeShops, getIsochrones } from '../fetch';
 import { filterMapData } from '../filterMapData';
 import MAP_STYLES from '../mapStyles';
+import { CoffeeShopModel, Coordinates, FilterType, MapData } from '../types';
+import { coffeeShopsToMapData, isochronesToCoordinatesAndMapData } from '../transform';
 import AppBar from './AppBar';
 import CoffeeShop from './CoffeeShop';
 import Loading from './Loading';
@@ -82,17 +83,7 @@ export default class App extends React.Component<Props, State> {
 
   async getAndSetCoffeeShops() {
     try {
-      const coffeeShops = await getRequest<CoffeeShopModel[]>(`${API_URL}/coffee_shop`);
-      const data: MapData[] = _.map(coffeeShops, coffeeShop => ({
-        id: `coffeeshop-${coffeeShop.id.toString()}`,
-        geometry: new google.maps.LatLng(
-          coffeeShop.coordinates.lat,
-          coffeeShop.coordinates.lng,
-        ),
-        metadata: coffeeShop,
-        icon: './assets/coffee_pin.png',
-        visible: true,
-      }));
+      const data = coffeeShopsToMapData(await getCoffeeShops(API_URL));
       this.setState({ mapData: this.state.mapData.concat(data) });
     } catch (err) {
       this.setState({errorMessage: 'Error getting coffee shops.'});
@@ -151,9 +142,7 @@ export default class App extends React.Component<Props, State> {
   
       try {
         // Grab isochrones and render them if we have a valid walking time.
-        const isochrones = await getRequest<number[][]>(
-          `${API_URL}/isochrone?origin=${lat},${lng}&walking_time_min=${walkingTimeMin}`,
-        );
+        const isochrones = await getIsochrones(API_URL, lat, lng, walkingTimeMin);
   
         // If a new request has come in after this request, exit out.
         if (
@@ -163,24 +152,16 @@ export default class App extends React.Component<Props, State> {
           return;
         }
   
-        const isochroneLatLngs: Coordinates[] = _.map(isochrones, isochrone => ({
-          lat: isochrone[0],
-          lng: isochrone[1],
-        }));
-    
         map.panTo(location);
-    
+        
         // Add origin/isochrones and hide coffee shops that aren't within the specified
         // walking distance.
-        newData.push({
-          id: 'isochrones',
-          geometry: new google.maps.Data.Polygon([isochroneLatLngs]),
-          visible: true,
-        });
-   
+        const [isochroneLatLngs, data] = isochronesToCoordinatesAndMapData(isochrones);
+        newData.push(data as MapData);
+
         // We need to create this polygon to use the google.maps.geometry.poly.containsLocation method.
         const isochronePolygon = new google.maps.Polygon({
-          paths: isochroneLatLngs,
+          paths: isochroneLatLngs as Coordinates[],
         });
         this.setState({ isochronePolygon, isFetchingIsochrone: false }, () =>
           this.updateMapData(mapData.concat(newData), (data: MapData) =>
@@ -196,9 +177,7 @@ export default class App extends React.Component<Props, State> {
   getCoffeeShopDetails(coffeeShop: CoffeeShopModel) {
     this.setState({selectedCoffeeShop: coffeeShop}, async () => {
       try {
-        const coffeeShopWithDetails = await getRequest<CoffeeShopModel>(
-          `${API_URL}/coffee_shop/${coffeeShop.id}`,
-        )
+        const coffeeShopWithDetails = await getCoffeeShop(API_URL, coffeeShop.id);
         console.log(coffeeShopWithDetails)
         this.setState({selectedCoffeeShop: coffeeShopWithDetails});
       } catch (err) {
