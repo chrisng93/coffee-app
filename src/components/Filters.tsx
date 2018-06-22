@@ -66,6 +66,7 @@ export default class Filters extends React.Component<Props, State> {
         <Checkbox
           label="Good for studying"
           checked={selectedFilter === 'study'}
+          iconStyle={{fill: colors.blueGrey700}}
           onCheck={(e, isInputChecked) =>
             onSelectFilter(isInputChecked ? 'study' : null)
           }

@@ -8,6 +8,7 @@ import { filterMapData } from '../filterMapData';
 import MAP_STYLES from '../mapStyles';
 import AppBar from './AppBar';
 import CoffeeShop from './CoffeeShop';
+import Loading from './Loading';
 import Map from './Map';
 
 const NY_VIEW = {
@@ -17,82 +18,6 @@ const NY_VIEW = {
 
 // TODO: Change this.
 const API_URL = 'http://localhost:8080';
-
-const testCoffeeShop = {
-  "id": 7,
-  "name": "Blue Bottle Coffee",
-  "coordinates": {
-      "lat": 40.68736,
-      "lng": -73.9897699
-  },
-  "yelp_id": "mRZaqNJqpS4YnRnCVRO5fQ",
-  "yelp_url": "https://www.yelp.com/biz/blue-bottle-coffee-brooklyn-7?adjust_creative=yEWd7aXEfny_E9-8M2rG0Q&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=yEWd7aXEfny_E9-8M2rG0Q",
-  "has_good_coffee": false,
-  "is_good_for_studying": false,
-  "photos": [
-      "https://s3-media2.fl.yelpcdn.com/bphoto/1Vs9RjmyxVTXFizusvPSvw/o.jpg",
-      "https://s3-media2.fl.yelpcdn.com/bphoto/Wm8tIfg1A3rSRvz5KQ1f2A/o.jpg",
-      "https://s3-media3.fl.yelpcdn.com/bphoto/m1i0uj3dU9ZalJ4kPAr_AQ/o.jpg"
-  ],
-  "location": {
-      "display_address": [
-          "85 Dean St",
-          "Brooklyn, NY 11201"
-      ]
-  },
-  "price": "$$",
-  "phone": "+15106533394",
-  "hours": [
-      {
-          "hours_type": "REGULAR",
-          "open": [
-              {
-                  "is_overnight": false,
-                  "start": "0700",
-                  "end": "1900",
-                  "day": 0
-              },
-              {
-                  "is_overnight": false,
-                  "start": "0700",
-                  "end": "1900",
-                  "day": 1
-              },
-              {
-                  "is_overnight": false,
-                  "start": "0700",
-                  "end": "1900",
-                  "day": 2
-              },
-              {
-                  "is_overnight": false,
-                  "start": "0700",
-                  "end": "1900",
-                  "day": 3
-              },
-              {
-                  "is_overnight": false,
-                  "start": "0700",
-                  "end": "1900",
-                  "day": 4
-              },
-              {
-                  "is_overnight": false,
-                  "start": "0700",
-                  "end": "1900",
-                  "day": 5
-              },
-              {
-                  "is_overnight": false,
-                  "start": "0700",
-                  "end": "1900",
-                  "day": 6
-              }
-          ],
-          "is_open_now": false
-      }
-  ]
-};
 
 interface Props {
   isSmallScreen: boolean;
@@ -118,6 +43,7 @@ interface State {
   // Polygon for the isochrones. Used for determining if a coffee shop should be visible (if
   // isochrones exist).
   isochronePolygon: google.maps.Polygon;
+  isFetchingIsochrone: boolean;
 }
 
 // TODO: Use redux.
@@ -134,6 +60,7 @@ export default class App extends React.Component<Props, State> {
       selectedLocation: null,
       walkingTimeMin: 10,
       isochronePolygon: null,
+      isFetchingIsochrone: false,
     };
     this.setMap = this.setMap.bind(this);
     this.onMapClick = this.onMapClick.bind(this);
@@ -181,6 +108,9 @@ export default class App extends React.Component<Props, State> {
   }
 
   onFeatureClick(event: google.maps.Data.MouseEvent) {
+    if (event.feature.getId() === 'origin' || event.feature.getId() === 'isochrone') {
+      return;
+    }
     this.getCoffeeShopDetails(event.feature.getProperty('metadata'));
   }
 
@@ -192,71 +122,75 @@ export default class App extends React.Component<Props, State> {
     this.setState({ mapData: newMapData });
   }
 
-  async getAndRenderIsochrones(
+  getAndRenderIsochrones(
     location: google.maps.LatLng,
     walkingTimeMin: number,
   ) {
-    const { map, mapData, selectedFilter } = this.state;
-    const lat = location.lat();
-    const lng = location.lng();
-    const newData: MapData[] = [
-      {
-        id: 'origin',
-        geometry: location,
-        visible: true,
-      },
-    ];
-
-    console.log('rendering with walking time', walkingTimeMin);
-    // Remove isochrones if walking time not specified.
-    if (walkingTimeMin === 0) {
-      this.updateMapData(mapData.concat(newData), (data: MapData) =>
-        filterMapData(data, null, selectedFilter),
-      );
-      return;
-    }
-
-    try {
-      // Grab isochrones and render them if we have a valid walking time.
-      const isochrones = await getRequest<number[][]>(
-        `${API_URL}/isochrone?origin=${lat},${lng}&walking_time_min=${walkingTimeMin}`,
-      );
-
-      // If a new request has come in after this request, exit out.
-      if (
-        this.state.selectedLocation !== location ||
-        this.state.walkingTimeMin !== walkingTimeMin
-      ) {
+    this.setState({isFetchingIsochrone: true}, async () => {
+      const { map, mapData, selectedFilter } = this.state;
+      const lat = location.lat();
+      const lng = location.lng();
+      const newData: MapData[] = [
+        {
+          id: 'origin',
+          geometry: location,
+          visible: true,
+        },
+      ];
+  
+      console.log('rendering with walking time', walkingTimeMin);
+      // Remove isochrones if walking time not specified.
+      if (walkingTimeMin === 0) {
+        this.setState({isFetchingIsochrone: false}, () =>
+          this.updateMapData(mapData.concat(newData), (data: MapData) =>
+            filterMapData(data, null, selectedFilter),
+          )
+        );
         return;
       }
-
-      const isochroneLatLngs: Coordinates[] = _.map(isochrones, isochrone => ({
-        lat: isochrone[0],
-        lng: isochrone[1],
-      }));
   
-      map.panTo(location);
+      try {
+        // Grab isochrones and render them if we have a valid walking time.
+        const isochrones = await getRequest<number[][]>(
+          `${API_URL}/isochrone?origin=${lat},${lng}&walking_time_min=${walkingTimeMin}`,
+        );
   
-      // Add origin/isochrones and hide coffee shops that aren't within the specified
-      // walking distance.
-      newData.push({
-        id: 'isochrones',
-        geometry: new google.maps.Data.Polygon([isochroneLatLngs]),
-        visible: true,
-      });
- 
-      // We need to create this polygon to use the google.maps.geometry.poly.containsLocation method.
-      const isochronePolygon = new google.maps.Polygon({
-        paths: isochroneLatLngs,
-      });
-      this.setState({ isochronePolygon }, () =>
-        this.updateMapData(mapData.concat(newData), (data: MapData) =>
-          filterMapData(data, isochronePolygon, selectedFilter),
-        ),
-      );
-    } catch (err) {
-      this.setState({errorMessage: 'Error getting isochrones.'});
-    }
+        // If a new request has come in after this request, exit out.
+        if (
+          this.state.selectedLocation !== location ||
+          this.state.walkingTimeMin !== walkingTimeMin
+        ) {
+          return;
+        }
+  
+        const isochroneLatLngs: Coordinates[] = _.map(isochrones, isochrone => ({
+          lat: isochrone[0],
+          lng: isochrone[1],
+        }));
+    
+        map.panTo(location);
+    
+        // Add origin/isochrones and hide coffee shops that aren't within the specified
+        // walking distance.
+        newData.push({
+          id: 'isochrones',
+          geometry: new google.maps.Data.Polygon([isochroneLatLngs]),
+          visible: true,
+        });
+   
+        // We need to create this polygon to use the google.maps.geometry.poly.containsLocation method.
+        const isochronePolygon = new google.maps.Polygon({
+          paths: isochroneLatLngs,
+        });
+        this.setState({ isochronePolygon, isFetchingIsochrone: false }, () =>
+          this.updateMapData(mapData.concat(newData), (data: MapData) =>
+            filterMapData(data, isochronePolygon, selectedFilter),
+          ),
+        );
+      } catch (err) {
+        this.setState({isFetchingIsochrone: false, errorMessage: 'Error getting isochrones.'});
+      }
+    });
   }
 
   getCoffeeShopDetails(coffeeShop: CoffeeShopModel) {
@@ -317,6 +251,7 @@ export default class App extends React.Component<Props, State> {
       selectedCoffeeShop,
       selectedLocation,
       walkingTimeMin,
+      isFetchingIsochrone,
     } = this.state;
     const {isSmallScreen} = this.props;
     if (hasError) {
@@ -330,6 +265,7 @@ export default class App extends React.Component<Props, State> {
           onRequestClose={() => this.setState({errorMessage: null})}
           autoHideDuration={2000}
         />
+        {isFetchingIsochrone ? <Loading /> : null}
         <AppBar
           isSmallScreen={isSmallScreen}
           map={map}
