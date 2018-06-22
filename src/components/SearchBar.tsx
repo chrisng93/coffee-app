@@ -111,14 +111,21 @@ export default class SearchBar extends React.Component<Props, State> {
   }
 
   onGeocode() {
-    this.geocoder.geocode({address: this.state.searchText, bounds: this.props.map.getBounds()}, (results, status) => {
-      if (status !== google.maps.GeocoderStatus.OK) {
-        console.error(`Places failure: ${status}`);
-        return;
-      }
+    this.geocoder.geocode(
+      { address: this.state.searchText, bounds: this.props.map.getBounds() },
+      (results, status) => {
+        if (status !== google.maps.GeocoderStatus.OK) {
+          console.error(`Places failure: ${status}`);
+          return;
+        }
 
-      this.setState({searchText: results[0].formatted_address, predictions: [], selectedPrediction: -1});
-    });
+        this.setState({
+          searchText: results[0].formatted_address,
+          predictions: [],
+          selectedPrediction: -1,
+        });
+      },
+    );
   }
 
   handleKeyDown(keyCode: number) {

@@ -18,7 +18,7 @@ export const filterMapData = (
 const composeFilterFns = (data: MapData, filterFns: FilterMapDataFn[]) => {
   _.each(filterFns, filterFn => (data = filterFn(data)));
   return data;
-}
+};
 
 const filterOnIsochrone = (data: MapData, polygon: google.maps.Polygon) => {
   if (!polygon) {

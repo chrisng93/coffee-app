@@ -2,7 +2,9 @@ import * as _ from 'underscore';
 
 import { CoffeeShopModel, Coordinates, MapData } from './types';
 
-export const coffeeShopsToMapData = (coffeeShops: CoffeeShopModel[]): MapData[] => {
+export const coffeeShopsToMapData = (
+  coffeeShops: CoffeeShopModel[],
+): MapData[] => {
   return _.map(coffeeShops, coffeeShop => ({
     id: `coffeeshop-${coffeeShop.id.toString()}`,
     geometry: new google.maps.LatLng(

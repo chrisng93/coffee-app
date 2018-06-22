@@ -1,4 +1,4 @@
-import {Snackbar} from 'material-ui';
+import { Snackbar } from 'material-ui';
 import * as React from 'react';
 import * as _ from 'underscore';
 
@@ -6,7 +6,10 @@ import { getCoffeeShop, getCoffeeShops, getIsochrones } from '../fetch';
 import { filterMapData } from '../filterMapData';
 import MAP_STYLES from '../mapStyles';
 import { CoffeeShopModel, Coordinates, FilterType, MapData } from '../types';
-import { coffeeShopsToMapData, isochronesToCoordinatesAndMapData } from '../transform';
+import {
+  coffeeShopsToMapData,
+  isochronesToCoordinatesAndMapData,
+} from '../transform';
 import AppBar from './AppBar';
 import CoffeeShop from './CoffeeShop';
 import Loading from './Loading';
@@ -86,7 +89,7 @@ export default class App extends React.Component<Props, State> {
       const data = coffeeShopsToMapData(await getCoffeeShops(API_URL));
       this.setState({ mapData: this.state.mapData.concat(data) });
     } catch (err) {
-      this.setState({errorMessage: 'Error getting coffee shops.'});
+      this.setState({ errorMessage: 'Error getting coffee shops.' });
     }
   }
 
@@ -99,7 +102,10 @@ export default class App extends React.Component<Props, State> {
   }
 
   onFeatureClick(event: google.maps.Data.MouseEvent) {
-    if (event.feature.getId() === 'origin' || event.feature.getId() === 'isochrone') {
+    if (
+      event.feature.getId() === 'origin' ||
+      event.feature.getId() === 'isochrone'
+    ) {
       return;
     }
     this.getCoffeeShopDetails(event.feature.getProperty('metadata'));
@@ -113,11 +119,8 @@ export default class App extends React.Component<Props, State> {
     this.setState({ mapData: newMapData });
   }
 
-  getAndRenderIsochrones(
-    location: google.maps.LatLng,
-    walkingTimeMin: number,
-  ) {
-    this.setState({isFetchingIsochrone: true}, async () => {
+  getAndRenderIsochrones(location: google.maps.LatLng, walkingTimeMin: number) {
+    this.setState({ isFetchingIsochrone: true }, async () => {
       const { map, mapData, selectedFilter } = this.state;
       const lat = location.lat();
       const lng = location.lng();
@@ -128,22 +131,27 @@ export default class App extends React.Component<Props, State> {
           visible: true,
         },
       ];
-  
+
       console.log('rendering with walking time', walkingTimeMin);
       // Remove isochrones if walking time not specified.
       if (walkingTimeMin === 0) {
-        this.setState({isFetchingIsochrone: false}, () =>
+        this.setState({ isFetchingIsochrone: false }, () =>
           this.updateMapData(mapData.concat(newData), (data: MapData) =>
             filterMapData(data, null, selectedFilter),
-          )
+          ),
         );
         return;
       }
-  
+
       try {
         // Grab isochrones and render them if we have a valid walking time.
-        const isochrones = await getIsochrones(API_URL, lat, lng, walkingTimeMin);
-  
+        const isochrones = await getIsochrones(
+          API_URL,
+          lat,
+          lng,
+          walkingTimeMin,
+        );
+
         // If a new request has come in after this request, exit out.
         if (
           this.state.selectedLocation !== location ||
@@ -151,12 +159,14 @@ export default class App extends React.Component<Props, State> {
         ) {
           return;
         }
-  
+
         map.panTo(location);
-        
+
         // Add origin/isochrones and hide coffee shops that aren't within the specified
         // walking distance.
-        const [isochroneLatLngs, data] = isochronesToCoordinatesAndMapData(isochrones);
+        const [isochroneLatLngs, data] = isochronesToCoordinatesAndMapData(
+          isochrones,
+        );
         newData.push(data as MapData);
 
         // We need to create this polygon to use the google.maps.geometry.poly.containsLocation method.
@@ -169,19 +179,25 @@ export default class App extends React.Component<Props, State> {
           ),
         );
       } catch (err) {
-        this.setState({isFetchingIsochrone: false, errorMessage: 'Error getting isochrones.'});
+        this.setState({
+          isFetchingIsochrone: false,
+          errorMessage: 'Error getting isochrones.',
+        });
       }
     });
   }
 
   getCoffeeShopDetails(coffeeShop: CoffeeShopModel) {
-    this.setState({selectedCoffeeShop: coffeeShop}, async () => {
+    this.setState({ selectedCoffeeShop: coffeeShop }, async () => {
       try {
-        const coffeeShopWithDetails = await getCoffeeShop(API_URL, coffeeShop.id);
-        console.log(coffeeShopWithDetails)
-        this.setState({selectedCoffeeShop: coffeeShopWithDetails});
+        const coffeeShopWithDetails = await getCoffeeShop(
+          API_URL,
+          coffeeShop.id,
+        );
+        console.log(coffeeShopWithDetails);
+        this.setState({ selectedCoffeeShop: coffeeShopWithDetails });
       } catch (err) {
-        this.setState({errorMessage: 'Error getting coffee shop details.'});
+        this.setState({ errorMessage: 'Error getting coffee shop details.' });
       }
     });
   }
@@ -232,16 +248,20 @@ export default class App extends React.Component<Props, State> {
       walkingTimeMin,
       isFetchingIsochrone,
     } = this.state;
-    const {isSmallScreen} = this.props;
+    const { isSmallScreen } = this.props;
     if (hasError) {
-      return <h1 style={{textAlign: 'center'}}>Something went wrong. Please refresh your page.</h1>;
+      return (
+        <h1 style={{ textAlign: 'center' }}>
+          Something went wrong. Please refresh your page.
+        </h1>
+      );
     }
     return (
       <div>
         <Snackbar
           open={errorMessage !== null}
           message={errorMessage}
-          onRequestClose={() => this.setState({errorMessage: null})}
+          onRequestClose={() => this.setState({ errorMessage: null })}
           autoHideDuration={2000}
         />
         {isFetchingIsochrone ? <Loading /> : null}
