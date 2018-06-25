@@ -51,6 +51,13 @@ export default class SearchBar extends React.Component<Props, State> {
     if (!this.places && nextProps.map) {
       this.places = new google.maps.places.PlacesService(nextProps.map);
     }
+    if (this.props.selectedLocation !== nextProps.selectedLocation) {
+      if (nextProps.selectedLocation) {
+        this.setState({searchText: `${nextProps.selectedLocation.lat().toFixed(4)}, ${nextProps.selectedLocation.lng().toFixed(4)}`});
+      } else {
+        this.setState({searchText: ''});
+      }
+    }
   }
 
   componentWillUpdate(nextProps: Props, nextState: State) {

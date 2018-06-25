@@ -57,7 +57,7 @@ export default class App extends React.Component<Props, State> {
     super(props);
     this.state = {
       hasError: false,
-      errorMessage: null,
+      errorMessage: '',
       map: null,
       mapData: [],
       selectedFilter: null,
@@ -127,14 +127,13 @@ export default class App extends React.Component<Props, State> {
       const lng = location.lng();
       const newData: MapData[] = [originToMapData(location)];
 
-      console.log('rendering with walking time', walkingTimeMin);
+      this.updateMapData(mapData.concat(newData), (data: MapData) =>
+        filterMapData(data, null, selectedFilter),
+      );
+
       // Remove isochrones if walking time not specified.
       if (walkingTimeMin === 0) {
-        this.setState({ isFetchingIsochrone: false }, () =>
-          this.updateMapData(mapData.concat(newData), (data: MapData) =>
-            filterMapData(data, null, selectedFilter),
-          ),
-        );
+        this.setState({ isFetchingIsochrone: false });
         return;
       }
 
@@ -254,9 +253,9 @@ export default class App extends React.Component<Props, State> {
     return (
       <div>
         <Snackbar
-          open={errorMessage !== null}
+          open={errorMessage !== ''}
           message={errorMessage}
-          onRequestClose={() => this.setState({ errorMessage: null })}
+          onRequestClose={() => this.setState({ errorMessage: '' })}
           autoHideDuration={2000}
         />
         {isFetchingIsochrone ? <Loading /> : null}

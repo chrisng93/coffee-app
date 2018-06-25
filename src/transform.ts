@@ -12,7 +12,6 @@ export const coffeeShopsToMapData = (
       coffeeShop.coordinates.lng,
     ),
     metadata: coffeeShop,
-    icon: './assets/coffee_pin.png',
     visible: true,
   }));
 };
