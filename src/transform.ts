@@ -13,7 +13,7 @@ export const coffeeShopsToMapData = (
     ),
     metadata: coffeeShop,
     visible: true,
-    icon: './assets/coffee.png',
+    icon: './assets/coffee_pin.png',
   }));
 };
 
@@ -21,6 +21,7 @@ export const originToMapData = (location: google.maps.LatLng) => ({
   id: 'origin',
   geometry: location,
   visible: true,
+  icon: './assets/origin_pin.png',
 });
 
 export const isochronesToCoordinatesAndMapData = (isochrones: number[][]) => {

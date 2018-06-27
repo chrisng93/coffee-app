@@ -123,10 +123,6 @@ export default class App extends React.Component<Props, State> {
       const lng = location.lng();
       const newData: MapData[] = [originToMapData(location)];
 
-      this.updateMapData(mapData.concat(newData), (data: MapData) =>
-        filterMapData(data, null, selectedFilter),
-      );
-
       // Remove isochrones if walking time not specified.
       if (walkingTimeMin === 0) {
         this.setState({ isFetchingIsochrone: false });
