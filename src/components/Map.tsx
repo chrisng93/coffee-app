@@ -140,7 +140,7 @@ export default class Map extends React.Component<Props, State> {
       this.map.data.overrideStyle(feature, {
         icon: {
           url: data.icon,
-          scaledSize: new google.maps.Size(46, 46),
+          scaledSize: new google.maps.Size(26, 42),
         },
       });
     }

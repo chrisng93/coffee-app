@@ -25,7 +25,8 @@
   "scripts": {
     "start": "node server.ts --port=3000",
     "dev": "webpack-dev-server --hot --inline --progress --colors",
-    "build": "webpack --config webpack.config.js --watch",
+    "prod": "node server.ts --port=80",
+    "build": "webpack --config webpack.config.js",
     "babel": "babel --presets es2015 js/main.js -o public/main.bundle.js",
     "prettier": "prettier --single-quote --trailing-comma all --write \"src/**/*.{ts,tsx}\""
   },

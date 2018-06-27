@@ -21,8 +21,7 @@ const NY_VIEW = {
   zoom: 14,
 };
 
-// TODO: Change this.
-const API_URL = 'http://localhost:8080';
+const API_URL = process.env.API_URL;
 
 interface Props {
   isSmallScreen: boolean;
@@ -103,13 +102,10 @@ export default class App extends React.Component<Props, State> {
   }
 
   onFeatureClick(event: google.maps.Data.MouseEvent) {
-    if (
-      event.feature.getId() === 'origin' ||
-      event.feature.getId() === 'isochrone'
-    ) {
-      return;
+    const metadata = event.feature.getProperty('metadata');
+    if (metadata && metadata.name) {
+      this.getCoffeeShopDetails(event.feature.getProperty('metadata'));
     }
-    this.getCoffeeShopDetails(event.feature.getProperty('metadata'));
   }
 
   updateMapData(mapData: MapData[], updateFn: (data: MapData) => MapData) {
@@ -188,7 +184,6 @@ export default class App extends React.Component<Props, State> {
           API_URL,
           coffeeShop.id,
         );
-        console.log(coffeeShopWithDetails);
         this.setState({ selectedCoffeeShop: coffeeShopWithDetails });
       } catch (err) {
         this.setState({ errorMessage: 'Error getting coffee shop details.' });

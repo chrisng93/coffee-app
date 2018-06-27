@@ -13,6 +13,7 @@ export const coffeeShopsToMapData = (
     ),
     metadata: coffeeShop,
     visible: true,
+    icon: './assets/coffee.png',
   }));
 };
 

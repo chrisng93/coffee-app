@@ -1,7 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 
-const isProd = process.env.ENVIRONMENT === 'production';
+const isProd = process.env.NODE_ENV === 'production';
 
 module.exports = {
   mode: isProd ? 'production' : 'development',
@@ -37,6 +37,12 @@ module.exports = {
       { enforce: 'pre', test: /\.js$/, loader: 'source-map-loader' }
     ]
   },
+
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.env.API_URL': JSON.stringify(process.env.API_URL || 'http://localhost:8080')
+    }),
+  ],
 
   devServer: {
     contentBase: path.join(__dirname, 'public'),
