@@ -109,11 +109,8 @@ export default class App extends React.Component<Props, State> {
   }
 
   updateMapData(mapData: MapData[], updateFn: (data: MapData) => MapData) {
-    let newMapData = mapData;
-    if (updateFn) {
-      newMapData = _.map(mapData, updateFn);
-    }
-    this.setState({ mapData: newMapData });
+    console.log('setting new map data', _.map(mapData, updateFn))
+    this.setState({ mapData: _.map(mapData, updateFn) });
   }
 
   getAndRenderIsochrones(location: google.maps.LatLng, walkingTimeMin: number) {
@@ -159,15 +156,22 @@ export default class App extends React.Component<Props, State> {
         const isochronePolygon = new google.maps.Polygon({
           paths: isochroneLatLngs as Coordinates[],
         });
-        this.setState({ isochronePolygon, isFetchingIsochrone: false }, () =>
-          this.updateMapData(mapData.concat(newData), (data: MapData) =>
+        console.log('setting new isochrone polygon')
+        this.setState({ isochronePolygon, isFetchingIsochrone: false }, () => {
+          const mapDataWithoutOldOriginIsochrone = _.filter(mapData, (data: MapData) => data.id !== 'origin' && data.id !== 'isochrones');
+          this.updateMapData(mapDataWithoutOldOriginIsochrone.concat(newData), (data: MapData) =>
             filterMapData(data, isochronePolygon, selectedFilter),
-          ),
+          );
+        }
         );
       } catch (err) {
         this.setState({
+          isochronePolygon: null,
           isFetchingIsochrone: false,
           errorMessage: 'Error getting isochrones.',
+        }, () => {
+          const mapDataWithoutOldOrigin = _.filter(mapData, (data: MapData) => data.id !== 'origin');
+          this.updateMapData(mapDataWithoutOldOrigin.concat(newData), (data: MapData) => filterMapData(data, null, selectedFilter))
         });
       }
     });
@@ -189,6 +193,7 @@ export default class App extends React.Component<Props, State> {
 
   onSelectFilter(filter: FilterType) {
     const { mapData, isochronePolygon } = this.state;
+    console.log(isochronePolygon)
     this.setState({ selectedFilter: filter }, () =>
       this.updateMapData(mapData, (data: MapData) =>
         filterMapData(data, isochronePolygon, filter),
@@ -259,6 +264,7 @@ export default class App extends React.Component<Props, State> {
           onSelectFilter={this.onSelectFilter}
           onSelectLocation={this.onSelectLocation}
           onSetWalkingTime={this.onSetWalkingTime}
+          onError={(msg: string) => this.setState({errorMessage: msg})}
         />
         {selectedCoffeeShop ? (
           <CoffeeShop

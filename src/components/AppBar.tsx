@@ -25,6 +25,7 @@ interface Props {
   onSetWalkingTime: (walkingTimeDisplay: number) => void;
   // Set the selected location.
   onSelectLocation: (location: google.maps.LatLng) => void;
+  onError: (msg: string) => void;
 }
 
 interface State {
@@ -53,6 +54,7 @@ export default class AppBar extends React.Component<Props, State> {
       onSelectFilter,
       onSetWalkingTime,
       onSelectLocation,
+      onError,
     } = this.props;
     const { filtersOpen, autocompleteOpen } = this.state;
     return (
@@ -83,9 +85,11 @@ export default class AppBar extends React.Component<Props, State> {
         {filtersOpen ? (
           <Filters
             selectedFilter={selectedFilter}
+            selectedLocation={selectedLocation}
             onSelectFilter={onSelectFilter}
             onSetWalkingTime={onSetWalkingTime}
             walkingTimeMin={walkingTimeMin}
+            onError={onError}
           />
         ) : null}
       </div>
