@@ -109,7 +109,6 @@ export default class App extends React.Component<Props, State> {
   }
 
   updateMapData(mapData: MapData[], updateFn: (data: MapData) => MapData) {
-    console.log('setting new map data', _.map(mapData, updateFn))
     this.setState({ mapData: _.map(mapData, updateFn) });
   }
 
@@ -156,7 +155,6 @@ export default class App extends React.Component<Props, State> {
         const isochronePolygon = new google.maps.Polygon({
           paths: isochroneLatLngs as Coordinates[],
         });
-        console.log('setting new isochrone polygon')
         this.setState({ isochronePolygon, isFetchingIsochrone: false }, () => {
           const mapDataWithoutOldOriginIsochrone = _.filter(mapData, (data: MapData) => data.id !== 'origin' && data.id !== 'isochrones');
           this.updateMapData(mapDataWithoutOldOriginIsochrone.concat(newData), (data: MapData) =>
