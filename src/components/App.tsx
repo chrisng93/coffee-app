@@ -191,7 +191,6 @@ export default class App extends React.Component<Props, State> {
 
   onSelectFilter(filter: FilterType) {
     const { mapData, isochronePolygon } = this.state;
-    console.log(isochronePolygon)
     this.setState({ selectedFilter: filter }, () =>
       this.updateMapData(mapData, (data: MapData) =>
         filterMapData(data, isochronePolygon, filter),
@@ -204,10 +203,12 @@ export default class App extends React.Component<Props, State> {
     if (!location) {
       this.setState(
         { selectedLocation: location, isochronePolygon: null },
-        () =>
-          this.updateMapData(mapData, (data: MapData) =>
+        () => {
+          const mapDataWithoutOldOrigin = _.filter(mapData, (data: MapData) => data.id !== 'origin');
+          this.updateMapData(mapDataWithoutOldOrigin, (data: MapData) =>
             filterMapData(data, null, selectedFilter),
-          ),
+          );
+        }
       );
     } else {
       this.setState({ selectedLocation: location }, () =>
