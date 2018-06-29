@@ -76,7 +76,7 @@ export default class Filters extends React.Component<Props, State> {
             onSelectFilter(isInputChecked ? 'study' : null)
           }
         />
-        <div style={{display: 'flex', alignItems: 'center'}}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
           <TextField
             value={walkingTimeDisplay || ''}
             floatingLabelText="Walking time (minutes)"
@@ -87,7 +87,7 @@ export default class Filters extends React.Component<Props, State> {
           />
           <FlatButton
             label="Set"
-            style={{marginTop: '20px', marginLeft: '12px'}}
+            style={{ marginTop: '20px', marginLeft: '12px' }}
             hoverColor={colors.blueGrey700}
             onClick={this.onSetWalkingTime}
           />

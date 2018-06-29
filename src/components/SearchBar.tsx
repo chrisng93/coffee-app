@@ -34,8 +34,8 @@ export default class SearchBar extends React.Component<Props, State> {
     this.autocomplete = new google.maps.places.AutocompleteService();
     this.geocoder = new google.maps.Geocoder();
     this.clearSearch = this.clearSearch.bind(this);
-    }
-    
+  }
+
   public readonly state: State = {
     searchText: '',
     predictions: [],
@@ -54,9 +54,13 @@ export default class SearchBar extends React.Component<Props, State> {
     }
     if (this.props.selectedLocation !== nextProps.selectedLocation) {
       if (nextProps.selectedLocation) {
-        this.setState({searchText: `${nextProps.selectedLocation.lat().toFixed(4)}, ${nextProps.selectedLocation.lng().toFixed(4)}`});
+        this.setState({
+          searchText: `${nextProps.selectedLocation
+            .lat()
+            .toFixed(4)}, ${nextProps.selectedLocation.lng().toFixed(4)}`,
+        });
       } else {
-        this.setState({searchText: ''});
+        this.setState({ searchText: '' });
       }
     }
   }

@@ -18,12 +18,7 @@ interface Props {
 
 const renderImages = (photos: string[], isSmallScreen: boolean) => (
   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-    {_.map(photos, (photoURL, i) => {
-      if ((isSmallScreen && i === 0) || !isSmallScreen) {
-        return <img key={photoURL} src={photoURL} />;
-      }
-      return null;
-    })}
+    {_.map(photos, (photoURL, i) => <img key={photoURL} src={photoURL} />)}
   </div>
 );
 
@@ -55,7 +50,11 @@ const CoffeeShop = ({ isSmallScreen, coffeeShop, onCloseDialog }: Props) => (
       // "loaded" state.
       <div className="coffee-shop">
         <div className="header">
-          <h2><a href={coffeeShop.yelp_url} target="_blank">{coffeeShop.name}</a></h2>
+          <h2>
+            <a href={coffeeShop.yelp_url} target="_blank">
+              {coffeeShop.name}
+            </a>
+          </h2>
           <div>{coffeeShop.price}</div>
         </div>
         {coffeeShop.photos

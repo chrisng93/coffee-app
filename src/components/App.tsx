@@ -63,7 +63,7 @@ export default class App extends React.Component<Props, State> {
     this.onSelectLocation = this.onSelectLocation.bind(this);
     this.onSetWalkingTime = this.onSetWalkingTime.bind(this);
   }
-  
+
   public readonly state: State = {
     hasError: false,
     errorMessage: '',
@@ -157,21 +157,34 @@ export default class App extends React.Component<Props, State> {
           paths: isochroneLatLngs as Coordinates[],
         });
         this.setState({ isochronePolygon, isFetchingIsochrone: false }, () => {
-          const mapDataWithoutOldOriginIsochrone = _.filter(mapData, (data: MapData) => data.id !== 'origin' && data.id !== 'isochrones');
-          this.updateMapData(mapDataWithoutOldOriginIsochrone.concat(newData), (data: MapData) =>
-            filterMapData(data, isochronePolygon, selectedFilter),
+          const mapDataWithoutOldOriginIsochrone = _.filter(
+            mapData,
+            (data: MapData) => data.id !== 'origin' && data.id !== 'isochrones',
           );
-        }
-        );
-      } catch (err) {
-        this.setState({
-          isochronePolygon: null,
-          isFetchingIsochrone: false,
-          errorMessage: 'Error getting isochrones.',
-        }, () => {
-          const mapDataWithoutOldOrigin = _.filter(mapData, (data: MapData) => data.id !== 'origin');
-          this.updateMapData(mapDataWithoutOldOrigin.concat(newData), (data: MapData) => filterMapData(data, null, selectedFilter))
+          this.updateMapData(
+            mapDataWithoutOldOriginIsochrone.concat(newData),
+            (data: MapData) =>
+              filterMapData(data, isochronePolygon, selectedFilter),
+          );
         });
+      } catch (err) {
+        this.setState(
+          {
+            isochronePolygon: null,
+            isFetchingIsochrone: false,
+            errorMessage: 'Error getting isochrones.',
+          },
+          () => {
+            const mapDataWithoutOldOrigin = _.filter(
+              mapData,
+              (data: MapData) => data.id !== 'origin',
+            );
+            this.updateMapData(
+              mapDataWithoutOldOrigin.concat(newData),
+              (data: MapData) => filterMapData(data, null, selectedFilter),
+            );
+          },
+        );
       }
     });
   }
@@ -205,11 +218,14 @@ export default class App extends React.Component<Props, State> {
       this.setState(
         { selectedLocation: location, isochronePolygon: null },
         () => {
-          const mapDataWithoutOldOrigin = _.filter(mapData, (data: MapData) => data.id !== 'origin');
+          const mapDataWithoutOldOrigin = _.filter(
+            mapData,
+            (data: MapData) => data.id !== 'origin',
+          );
           this.updateMapData(mapDataWithoutOldOrigin, (data: MapData) =>
             filterMapData(data, null, selectedFilter),
           );
-        }
+        },
       );
     } else {
       this.setState({ selectedLocation: location }, () =>
@@ -264,7 +280,7 @@ export default class App extends React.Component<Props, State> {
           onSelectFilter={this.onSelectFilter}
           onSelectLocation={this.onSelectLocation}
           onSetWalkingTime={this.onSetWalkingTime}
-          onError={(msg: string) => this.setState({errorMessage: msg})}
+          onError={(msg: string) => this.setState({ errorMessage: msg })}
         />
         {selectedCoffeeShop ? (
           <CoffeeShop

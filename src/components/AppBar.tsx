@@ -40,7 +40,7 @@ export default class AppBar extends React.Component<Props, State> {
     filtersOpen: false,
     autocompleteOpen: false,
   };
-      
+
   render() {
     const {
       isSmallScreen,
