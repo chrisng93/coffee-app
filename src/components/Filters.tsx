@@ -54,10 +54,10 @@ export default class Filters extends React.Component<Props, State> {
   }
 
   onSetWalkingTime() {
-    const { selectedLocation, onSetWalkingTime, onError } = this.props;
+    const { selectedLocation, walkingTimeMin, onSetWalkingTime, onError } = this.props;
     if (!selectedLocation) {
       onError('Please select a location first');
-    } else {
+    } else if (this.state.walkingTimeDisplay !== walkingTimeMin) {
       onSetWalkingTime(parseInt(this.state.walkingTimeDisplay as string));
     }
   }
