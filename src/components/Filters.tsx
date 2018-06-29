@@ -16,7 +16,6 @@ interface Props {
   // Time in min that the user wants to walk to get coffee. This is the actual value, rather than
   // the display in the text field.
   walkingTimeMin: number;
-  onError: (msg: string) => void;
 }
 
 interface State {
@@ -54,10 +53,8 @@ export default class Filters extends React.Component<Props, State> {
   }
 
   onSetWalkingTime() {
-    const { selectedLocation, walkingTimeMin, onSetWalkingTime, onError } = this.props;
-    if (!selectedLocation) {
-      onError('Please select a location first');
-    } else if (this.state.walkingTimeDisplay !== walkingTimeMin) {
+    const { walkingTimeMin, onSetWalkingTime } = this.props;
+    if (this.state.walkingTimeDisplay !== walkingTimeMin) {
       onSetWalkingTime(parseInt(this.state.walkingTimeDisplay as string));
     }
   }

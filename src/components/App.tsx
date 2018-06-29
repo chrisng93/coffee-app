@@ -235,11 +235,12 @@ export default class App extends React.Component<Props, State> {
   }
 
   onSetWalkingTime(newWalkingTimeMin: number) {
-    const { selectedLocation } = this.state;
-    if (selectedLocation) {
-      this.getAndRenderIsochrones(selectedLocation, newWalkingTimeMin);
-    }
-    this.setState({ walkingTimeMin: newWalkingTimeMin });
+    this.setState({ walkingTimeMin: newWalkingTimeMin }, () => {
+      const { selectedLocation } = this.state;
+      if (selectedLocation) {
+        this.getAndRenderIsochrones(selectedLocation, newWalkingTimeMin);
+      }
+    });
   }
 
   render() {
@@ -280,7 +281,6 @@ export default class App extends React.Component<Props, State> {
           onSelectFilter={this.onSelectFilter}
           onSelectLocation={this.onSelectLocation}
           onSetWalkingTime={this.onSetWalkingTime}
-          onError={(msg: string) => this.setState({ errorMessage: msg })}
         />
         {selectedCoffeeShop ? (
           <CoffeeShop
