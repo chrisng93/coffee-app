@@ -27,7 +27,7 @@ interface State {
 export default class Filters extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.onSubmit = this.onSubmit.bind(this);
+    this.onSetWalkingTime = this.onSetWalkingTime.bind(this);
   }
 
   public readonly state: State = {
@@ -53,7 +53,7 @@ export default class Filters extends React.Component<Props, State> {
     this.setState({ walkingTimeDisplay: numVal, walkingTimeError: '' });
   }
 
-  onSubmit() {
+  onSetWalkingTime() {
     const { selectedLocation, onSetWalkingTime, onError } = this.props;
     if (!selectedLocation) {
       onError('Please select a location first');
@@ -86,10 +86,10 @@ export default class Filters extends React.Component<Props, State> {
             onChange={(event, val) => this.onWalkingTimeInputChanged(val)}
           />
           <FlatButton
-            label="Submit"
+            label="Set"
             style={{marginTop: '20px', marginLeft: '12px'}}
             hoverColor={colors.blueGrey700}
-            onClick={this.onSubmit}
+            onClick={this.onSetWalkingTime}
           />
         </div>
       </div>
