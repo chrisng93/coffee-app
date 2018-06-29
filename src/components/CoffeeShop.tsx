@@ -47,7 +47,7 @@ const formatPhoneNumber = (phoneNumber: string) =>
 const CoffeeShop = ({ isSmallScreen, coffeeShop, onCloseDialog }: Props) => (
   <Dialog
     style={{ width: '100%', paddingTop: 0 }}
-    contentStyle={{ maxWidth: '850px' }}
+    contentStyle={{ width: isSmallScreen ? '95%' : '75%', maxWidth: '850px' }}
     open={coffeeShop !== null}
     onRequestClose={onCloseDialog}
   >
