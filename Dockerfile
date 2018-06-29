@@ -17,7 +17,7 @@ RUN npm install
 COPY . /usr/src/coffee-around-me/
 
 ENV NODE_ENV=production
-ENV API_URL=http://localhost:8080
+ENV API_URL=www.coffeearoundme.com
 
 # Expose port
 EXPOSE 80
