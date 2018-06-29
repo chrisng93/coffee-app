@@ -31,15 +31,16 @@ export default class SearchBar extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    this.state = {
-      searchText: '',
-      predictions: [],
-      selectedPrediction: -1,
-    };
     this.autocomplete = new google.maps.places.AutocompleteService();
     this.geocoder = new google.maps.Geocoder();
     this.clearSearch = this.clearSearch.bind(this);
-  }
+    }
+    
+  public readonly state: State = {
+    searchText: '',
+    predictions: [],
+    selectedPrediction: -1,
+  };
 
   componentWillMount() {
     document.addEventListener('keydown', event =>

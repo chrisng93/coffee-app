@@ -29,12 +29,9 @@ interface State {
 export default class Map extends React.Component<Props, State> {
   map: google.maps.Map;
 
-  constructor(props: Props) {
-    super(props);
-    this.state = {
-      idToMapData: {},
-    };
-  }
+  public readonly state: State = {
+    idToMapData: {},
+  };
 
   componentDidMount() {
     const {

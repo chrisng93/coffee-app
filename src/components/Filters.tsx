@@ -27,12 +27,13 @@ interface State {
 export default class Filters extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.state = {
-      walkingTimeDisplay: props.walkingTimeMin,
-      walkingTimeError: '',
-    };
     this.onSubmit = this.onSubmit.bind(this);
   }
+
+  public readonly state: State = {
+    walkingTimeDisplay: this.props.walkingTimeMin,
+    walkingTimeError: '',
+  };
 
   componentWillReceiveProps(nextProps: Props) {
     if (this.props.walkingTimeMin !== nextProps.walkingTimeMin) {

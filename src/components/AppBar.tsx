@@ -36,14 +36,11 @@ interface State {
 }
 
 export default class AppBar extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = {
-      filtersOpen: false,
-      autocompleteOpen: false,
-    };
-  }
-
+  public readonly state: State = {
+    filtersOpen: false,
+    autocompleteOpen: false,
+  };
+      
   render() {
     const {
       isSmallScreen,
