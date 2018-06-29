@@ -1,8 +1,6 @@
 # Use current version of node
 FROM node:latest
 
-MAINTAINER Chris Ng, chris.ng93@gmail.com
-
 RUN npm install webpack -g
 
 # Create app directory
