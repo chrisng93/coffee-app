@@ -13,6 +13,10 @@ interface Props {
   isSmallScreen: boolean;
   // Map for passing down to SearchBar.
   map: google.maps.Map;
+  // Whether or not filters are open.
+  filtersOpen: boolean;
+  // Toggle filter open status.
+  onToggleFilter: () => void;
   // Currently selected filter. Null if none.
   selectedFilter: FilterType;
   // The google.maps.LatLng object of the selected location, if any.
@@ -28,15 +32,12 @@ interface Props {
 }
 
 interface State {
-  // Whether or not filters are open.
-  filtersOpen: boolean;
   // Whether or not autocomplete is open.
   autocompleteOpen: boolean;
 }
 
 export default class AppBar extends React.Component<Props, State> {
   public readonly state: State = {
-    filtersOpen: false,
     autocompleteOpen: false,
   };
 
@@ -44,6 +45,8 @@ export default class AppBar extends React.Component<Props, State> {
     const {
       isSmallScreen,
       map,
+      filtersOpen,
+      onToggleFilter,
       selectedFilter,
       selectedLocation,
       walkingTimeMin,
@@ -51,7 +54,7 @@ export default class AppBar extends React.Component<Props, State> {
       onSetWalkingTime,
       onSelectLocation,
     } = this.props;
-    const { filtersOpen, autocompleteOpen } = this.state;
+    const { autocompleteOpen } = this.state;
     return (
       <div>
         <Toolbar className="app-bar">
@@ -72,7 +75,7 @@ export default class AppBar extends React.Component<Props, State> {
             />
           </ToolbarGroup>
           <ToolbarGroup lastChild={true}>
-            <div onClick={() => this.setState({ filtersOpen: !filtersOpen })}>
+            <div onClick={onToggleFilter}>
               {filtersOpen ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
             </div>
           </ToolbarGroup>

@@ -36,6 +36,8 @@ interface State {
   map: google.maps.Map;
   // Data for rendering features on map.
   mapData: MapData[];
+  // Whether or not filters are open.
+  filtersOpen: boolean;
   // Currently selected filter. Null if none.
   selectedFilter: FilterType;
   // Selected coffee shop (if any).
@@ -69,6 +71,7 @@ export default class App extends React.Component<Props, State> {
     errorMessage: '',
     map: null,
     mapData: [],
+    filtersOpen: false,
     selectedFilter: null,
     selectedCoffeeShop: null,
     selectedLocation: null,
@@ -114,7 +117,7 @@ export default class App extends React.Component<Props, State> {
   }
 
   getAndRenderIsochrones(location: google.maps.LatLng, walkingTimeMin: number) {
-    this.setState({ isFetchingIsochrone: true }, async () => {
+    this.setState({ isFetchingIsochrone: true, filtersOpen: false }, async () => {
       const { map, mapData, selectedFilter } = this.state;
       const lat = location.lat();
       const lng = location.lng();
@@ -249,6 +252,7 @@ export default class App extends React.Component<Props, State> {
       errorMessage,
       map,
       mapData,
+      filtersOpen,
       selectedFilter,
       selectedCoffeeShop,
       selectedLocation,
@@ -275,6 +279,8 @@ export default class App extends React.Component<Props, State> {
         <AppBar
           isSmallScreen={isSmallScreen}
           map={map}
+          filtersOpen={filtersOpen}
+          onToggleFilter={() => this.setState({filtersOpen: !filtersOpen})}
           selectedFilter={selectedFilter}
           selectedLocation={selectedLocation}
           walkingTimeMin={walkingTimeMin}
