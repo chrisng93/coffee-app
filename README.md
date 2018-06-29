@@ -7,7 +7,7 @@ yarn install
 ```
 
 ## Run the application
-1. If you're running the [Coffee Around Me backend](https://github.com/chrisng93/coffee-backend/blob/master/README.md)
+1. If you're running the [Coffee Around Me backend](https://github.com/chrisng93/coffee-backend)
 (which I would recommend doing, since the frontend is just a map without it), then set the API URL for that backend
 by running the following command in your terminal:
 ```
