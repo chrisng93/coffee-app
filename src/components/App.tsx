@@ -54,18 +54,6 @@ interface State {
 export default class App extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.state = {
-      hasError: false,
-      errorMessage: '',
-      map: null,
-      mapData: [],
-      selectedFilter: null,
-      selectedCoffeeShop: null,
-      selectedLocation: null,
-      walkingTimeMin: 10,
-      isochronePolygon: null,
-      isFetchingIsochrone: false,
-    };
     this.setMap = this.setMap.bind(this);
     this.onMapClick = this.onMapClick.bind(this);
     this.onFeatureClick = this.onFeatureClick.bind(this);
@@ -75,6 +63,19 @@ export default class App extends React.Component<Props, State> {
     this.onSelectLocation = this.onSelectLocation.bind(this);
     this.onSetWalkingTime = this.onSetWalkingTime.bind(this);
   }
+  
+  public readonly state: State = {
+    hasError: false,
+    errorMessage: '',
+    map: null,
+    mapData: [],
+    selectedFilter: null,
+    selectedCoffeeShop: null,
+    selectedLocation: null,
+    walkingTimeMin: 10,
+    isochronePolygon: null,
+    isFetchingIsochrone: false,
+  };
 
   componentDidMount() {
     this.getAndSetCoffeeShops();
